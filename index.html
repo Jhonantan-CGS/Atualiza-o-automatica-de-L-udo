@@ -486,6 +486,16 @@
             return resultados;
         }
 
+        function garantirArray(valor) {
+            return Array.isArray(valor) ? valor : [];
+        }
+
+        function normalizarContagem(valor, fallback = 0) {
+            const numero = Number(valor);
+            if (!Number.isFinite(numero) || numero < 0) return fallback;
+            return Math.floor(numero);
+        }
+
         function extrairPrimeiraOcorrencia(texto, regex) {
             const resultados = extrairOcorrencias(texto, regex);
             return resultados.length > 0 ? resultados[0] : null;
@@ -537,10 +547,10 @@
             return {
                 cliente: extrairCliente(textoOriginal),
                 descCompletaPdf: extrairDescricaoProduto(textoLimpo),
-                nfs: extrairNotasFiscais(textoLimpo),
-                datasNf: extrairDatasEmissao(textoLimpo),
-                lotes: extrairLotes(textoLimpo),
-                quantidades: extrairQuantidades(textoLimpo),
+                nfs: garantirArray(extrairNotasFiscais(textoLimpo)),
+                datasNf: garantirArray(extrairDatasEmissao(textoLimpo)),
+                lotes: garantirArray(extrairLotes(textoLimpo)),
+                quantidades: garantirArray(extrairQuantidades(textoLimpo)),
                 fab: extrairFabricacao(textoLimpo),
                 val: extrairValidade(textoLimpo)
             };
@@ -563,10 +573,18 @@
         }
 
         function montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal) {
-            const registros = textosPaginas.map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal)).filter(Boolean);
+            const paginas = garantirArray(textosPaginas);
+            const registros = paginas.map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal)).filter(Boolean);
             if (registros.length > 0) return registros;
 
-            const totalRegistros = Math.max(contextoGlobal.nfs.length, contextoGlobal.datasNf.length, contextoGlobal.lotes.length, contextoGlobal.quantidades.length, 1);
+            const totalRegistros = Math.max(
+                normalizarContagem(contextoGlobal.nfs && contextoGlobal.nfs.length),
+                normalizarContagem(contextoGlobal.datasNf && contextoGlobal.datasNf.length),
+                normalizarContagem(contextoGlobal.lotes && contextoGlobal.lotes.length),
+                normalizarContagem(contextoGlobal.quantidades && contextoGlobal.quantidades.length),
+                1
+            );
+            logFluxo('fallback_registros_calculado', { totalRegistros }, 'info');
             return Array.from({ length: totalRegistros }, (_, indice) => {
                 const quantidadeBruta = contextoGlobal.quantidades[indice] || contextoGlobal.quantidades[0] || null;
                 return {
@@ -592,17 +610,22 @@
 
             await atualizarStatus('📄 Abrindo PDF...', true, 'info');
             const pdf = await executarComTimeout(() => pdfjsLib.getDocument({ data: arrayBuffer }).promise, TIMEOUTS_MS.pdfLoad, 'Abertura do PDF');
-            logFluxo('pdf_aberto', { paginas: pdf.numPages });
+            const totalPaginas = normalizarContagem(pdf.numPages);
+            if (!totalPaginas) {
+                throw criarErroControlado('PDF_SEM_PAGINAS', 'O PDF não possui páginas válidas para leitura.');
+            }
+            logFluxo('pdf_aberto', { paginas: totalPaginas });
 
             const textosPaginas = [];
-            for (let paginaIndex = 1; paginaIndex <= pdf.numPages; paginaIndex++) {
-                await atualizarStatus(`📄 Extraindo texto da página ${paginaIndex}/${pdf.numPages}...`, true, 'info');
+            for (let paginaIndex = 1; paginaIndex <= totalPaginas; paginaIndex++) {
+                await atualizarStatus(`📄 Extraindo texto da página ${paginaIndex}/${totalPaginas}...`, true, 'info');
                 logFluxo('leitura_pagina_iniciada', { pagina: paginaIndex });
                 const page = await executarComTimeout(() => pdf.getPage(paginaIndex), TIMEOUTS_MS.pageRead, `Abertura da página ${paginaIndex}`);
                 const content = await executarComTimeout(() => page.getTextContent(), TIMEOUTS_MS.pageRead, `Leitura da página ${paginaIndex}`);
-                const textoPagina = content.items.map(item => item.str).join(' ').trim();
+                const itens = garantirArray(content && content.items);
+                const textoPagina = itens.map(item => item.str).join(' ').trim();
                 textosPaginas.push(textoPagina);
-                logFluxo('leitura_pagina_concluida', { pagina: paginaIndex, itensTexto: content.items.length, caracteres: textoPagina.length });
+                logFluxo('leitura_pagina_concluida', { pagina: paginaIndex, itensTexto: itens.length, caracteres: textoPagina.length });
             }
 
             const textoCompleto = textosPaginas.join(' ').trim();
