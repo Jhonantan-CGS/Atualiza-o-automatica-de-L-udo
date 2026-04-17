@@ -287,14 +287,17 @@
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             let texto = "";
+            const textosPaginas = [];
             
             for(let i=1; i<=pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const content = await page.getTextContent();
-                texto += content.items.map(it => it.str).join(' ');
+                const textoPagina = content.items.map(it => it.str).join(' ');
+                textosPaginas.push(textoPagina);
+                texto += ` ${textoPagina}`;
             }
             
-            await processarNf(texto);
+            await processarNfPorPagina(texto, textosPaginas);
         };
 
         function obterSaudacao() {
@@ -333,19 +336,207 @@
         }
 
         function abrirGmailComAssinatura() {
-            navigator.clipboard.writeText(emailCorpoFinal).then(() => {
-                const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${emailDestinatario}&su=${encodeURIComponent(emailAssuntoFinal)}`;
-                window.open(urlGmail, '_blank');
-            }).catch(err => {
-                alert("Falha ao copiar automaticamente. Copie o texto da tela.");
+            if (!emailCorpoFinal) {
+                alert("Valide os dados na Aba 2 antes de abrir o Gmail.");
+                return;
+            }
+
+            const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailDestinatario)}&su=${encodeURIComponent(emailAssuntoFinal)}&body=${encodeURIComponent(emailCorpoFinal)}`;
+            window.open(urlGmail, '_blank');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(emailCorpoFinal).catch(() => {
+                    alert("O Gmail foi aberto com a mensagem preenchida, mas não foi possível copiar o texto automaticamente.");
+                });
+            }
+        }
+
+        function normalizarTextoPdf(texto) {
+            return texto
+                .replace(/\s+/g, ' ')
+                .toUpperCase()
+                .replace(/CA LCIO/g, 'CALCIO')
+                .replace(/TOT AL/g, 'TOTAL')
+                .replace(/FABR ICACAO/g, 'FABRICACAO');
+        }
+
+        function extrairOcorrencias(texto, regex) {
+            const resultados = [];
+            let match;
+
+            while ((match = regex.exec(texto)) !== null) {
+                const valor = (match[1] || "").trim();
+                if (valor) resultados.push(valor);
+            }
+
+            return resultados;
+        }
+
+        function extrairPrimeiraOcorrencia(texto, regex) {
+            const resultados = extrairOcorrencias(texto, regex);
+            return resultados.length > 0 ? resultados[0] : null;
+        }
+
+        function extrairNotasFiscais(textoLimpo) {
+            return extrairOcorrencias(textoLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/gi);
+        }
+
+        function extrairDatasEmissao(textoLimpo) {
+            return extrairOcorrencias(textoLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/gi);
+        }
+
+        function extrairLotes(textoLimpo) {
+            return extrairOcorrencias(textoLimpo, /LOTE[\s:]*([A-Z0-9]+)/gi);
+        }
+
+        function extrairQuantidades(textoLimpo) {
+            const padroes = [
+                /(?:QTD(?:ADE)?|QUANT(?:IDADE)?)[^\d]{0,20}(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)/gi,
+                /\b(?:TO|TN|TON|TONELADAS?)\s*(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\b/gi,
+                /\b(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\s*(?:TO|TN|TON|TONELADAS?)\b/gi
+            ];
+
+            for (const padrao of padroes) {
+                const quantidades = extrairOcorrencias(textoLimpo, padrao);
+                if (quantidades.length > 0) return quantidades;
+            }
+
+            return [];
+        }
+
+        function converterQuantidadeParaNumero(valorBruto) {
+            if (!valorBruto) return null;
+
+            const numero = parseFloat(valorBruto.replace(/\./g, '').replace(',', '.'));
+            return Number.isFinite(numero) ? numero : null;
+        }
+
+        function formatarQuantidadeToneladas(valorBruto) {
+            const numero = converterQuantidadeParaNumero(valorBruto);
+            if (numero === null) return "---";
+
+            return numero.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
         }
 
-        async function processarNf(texto) {
+        function extrairFabricacao(textoLimpo) {
+            return extrairPrimeiraOcorrencia(textoLimpo, /FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i);
+        }
+
+        function extrairValidade(textoLimpo) {
+            return extrairPrimeiraOcorrencia(textoLimpo, /VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i);
+        }
+
+        function extrairCliente(textoOriginal) {
+            const clienteRaw = textoOriginal.match(/NOME\/RAZ\S*\s+SOCIAL\s+(.*?)(?:\s+ENDERE\S*O|\s+CNPJ)/i);
+            return clienteRaw ? clienteRaw[1].trim() : "---";
+        }
+
+        function extrairDescricaoProduto(textoLimpo) {
+            const descMatch = textoLimpo.match(/\d{5}\s+(FERTILIZANTE.*?AGRICULTURA)/i);
+            return descMatch ? descMatch[1] : "FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS";
+        }
+
+        function montarContextoGlobal(textoOriginal, textoLimpo) {
+            return {
+                cliente: extrairCliente(textoOriginal),
+                descCompletaPdf: extrairDescricaoProduto(textoLimpo),
+                nfs: extrairNotasFiscais(textoLimpo),
+                datasNf: extrairDatasEmissao(textoLimpo),
+                lotes: extrairLotes(textoLimpo),
+                quantidades: extrairQuantidades(textoLimpo),
+                fab: extrairFabricacao(textoLimpo),
+                val: extrairValidade(textoLimpo)
+            };
+        }
+
+        function montarRegistroPagina(textoPagina, indicePagina, contextoGlobal) {
+            const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
+            const quantidadeBruta = (extrairQuantidades(textoPaginaLimpo)[0])
+                || contextoGlobal.quantidades[indicePagina]
+                || contextoGlobal.quantidades[0]
+                || null;
+
+            const registro = {
+                nf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/i) || contextoGlobal.nfs[indicePagina] || contextoGlobal.nfs[0] || "---",
+                dataNf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/i) || contextoGlobal.datasNf[indicePagina] || contextoGlobal.datasNf[0] || "---",
+                lote: extrairPrimeiraOcorrencia(textoPaginaLimpo, /LOTE[\s:]*([A-Z0-9]+)/i) || contextoGlobal.lotes[indicePagina] || contextoGlobal.lotes[0] || "---",
+                quantidadeBruta,
+                quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
+                fab: extrairFabricacao(textoPaginaLimpo) || contextoGlobal.fab || "---",
+                val: extrairValidade(textoPaginaLimpo) || contextoGlobal.val || "---"
+            };
+
+            const temDadosPagina = [registro.nf, registro.lote, registro.quantidadeBruta].some((valor) => valor && valor !== "---");
+            return temDadosPagina ? registro : null;
+        }
+
+        function montarRegistrosLaudo(textosPaginas, textoCompletoLimpo) {
+            const registros = [];
+            const qtdsGlobais = extrairQuantidades(textoCompletoLimpo);
+            let indiceQtdGlobal = 0;
+
+            // Cada página mantém seu próprio contexto para evitar desencontro entre lote e quantidade.
+            textosPaginas.forEach((textoPagina) => {
+                const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
+                const lotesPagina = extrairLotes(textoPaginaLimpo);
+                const qtdsPagina = extrairQuantidades(textoPaginaLimpo);
+                const qtdUnicaPagina = qtdsPagina.length === 1 ? qtdsPagina[0] : null;
+
+                lotesPagina.forEach((lote, indiceLote) => {
+                    const quantidade = qtdsPagina[indiceLote] || qtdUnicaPagina || qtdsGlobais[indiceQtdGlobal] || null;
+                    registros.push({ lote, quantidade });
+                    indiceQtdGlobal += 1;
+                });
+            });
+
+            if (registros.length > 0) return registros;
+
+            const lotesGlobais = extrairLotes(textoCompletoLimpo);
+            const qtdUnicaGlobal = qtdsGlobais.length === 1 ? qtdsGlobais[0] : null;
+
+            return lotesGlobais.map((lote, indice) => ({
+                lote,
+                quantidade: qtdsGlobais[indice] || qtdUnicaGlobal || null
+            }));
+        }
+
+        function montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal) {
+            const registros = textosPaginas
+                .map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal))
+                .filter(Boolean);
+
+            if (registros.length > 0) return registros;
+
+            const totalRegistros = Math.max(
+                contextoGlobal.nfs.length,
+                contextoGlobal.datasNf.length,
+                contextoGlobal.lotes.length,
+                contextoGlobal.quantidades.length,
+                1
+            );
+
+            return Array.from({ length: totalRegistros }, (_, indice) => {
+                const quantidadeBruta = contextoGlobal.quantidades[indice] || contextoGlobal.quantidades[0] || null;
+
+                return {
+                    nf: contextoGlobal.nfs[indice] || contextoGlobal.nfs[0] || "---",
+                    dataNf: contextoGlobal.datasNf[indice] || contextoGlobal.datasNf[0] || "---",
+                    lote: contextoGlobal.lotes[indice] || contextoGlobal.lotes[0] || "---",
+                    quantidadeBruta,
+                    quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
+                    fab: contextoGlobal.fab || "---",
+                    val: contextoGlobal.val || "---"
+                };
+            }).filter((registro) => registro.lote !== "---" || registro.nf !== "---");
+        }
+
+        async function processarNf(texto, textosPaginas = [texto]) {
             await atualizarStatus("🔍 Buscando Lotes e cruzando dados...");
             
-            let textoLimpo = texto.replace(/\s+/g, ' ').toUpperCase();
-            textoLimpo = textoLimpo.replace(/CA LCIO/g, 'CALCIO').replace(/TOT AL/g, 'TOTAL').replace(/FABR ICACAO/g, 'FABRICACAO');
+            const textoLimpo = normalizarTextoPdf(texto);
 
             const nf = (textoLimpo.match(/N[.\sº]*0*(\d{4,9})/i) || ["","---"])[1];
             window.numeroNfAtual = nf; 
@@ -359,42 +550,32 @@
             const descMatch = textoLimpo.match(/\d{5}\s+(FERTILIZANTE.*?AGRICULTURA)/i);
             const descCompletaPdf = descMatch ? descMatch[1] : "FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS";
             
-            const lotes = [];
-            const rLote = /LOTE[\s:]*([A-Z0-9]+)/gi;
-            let m;
-            while ((m = rLote.exec(textoLimpo)) !== null) { lotes.push(m[1]); }
-
-            const qtds = [];
-            const rQtd = /\b(\d{1,3},\d{4})(?!\d|,)/g;
-            while ((m = rQtd.exec(textoLimpo)) !== null) { qtds.push(m[1]); }
+            const registrosLaudo = montarRegistrosLaudo(textosPaginas, textoLimpo);
 
             const fabMatch = textoLimpo.match(/FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i);
             const valMatch = textoLimpo.match(/VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i);
             
             // PREENCHE A ABA 2 (Verificação) COM O QUE ENCONTROU NO PDF
-            if(lotes.length > 0) document.getElementById('vLote').value = lotes[0];
+            if(registrosLaudo.length > 0) document.getElementById('vLote').value = registrosLaudo[0].lote;
             if(fabMatch) document.getElementById('vFab').value = fabMatch[1];
             if(valMatch) document.getElementById('vVal').value = valMatch[1];
 
             const area = document.getElementById('containerLaudos');
             area.innerHTML = "";
 
-            if(lotes.length === 0) {
+            if(registrosLaudo.length === 0) {
                 await atualizarStatus("⚠️ Nenhum lote encontrado. Verifique o PDF.", false);
                 return;
             }
 
-            for(let i=0; i<lotes.length; i++) {
-                const final = lotes[i].slice(-4);
+            for(let i=0; i<registrosLaudo.length; i++) {
+                const registroAtual = registrosLaudo[i];
+                const final = registroAtual.lote.slice(-4);
                 let dados = { dureza: "3,30", m4: 0, m10: 98.33, m18: 1.19, prato: 0.48 };
 
-                let tonExibicao = "---";
-                if (qtds[i]) {
-                    let numQuebrado = parseFloat(qtds[i].replace(',', '.'));
-                    tonExibicao = numQuebrado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                }
+                const tonExibicao = formatarQuantidadeToneladas(registroAtual.quantidade);
 
-                await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${lotes[i]}...`);
+                await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${registroAtual.lote}...`);
 
                 try {
                     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${final}'!A1:G20?key=${API_KEY}`);
@@ -422,7 +603,7 @@
                             <div class="dado-item" style="grid-column: span 2;"><strong>Descrição do Produto</strong><span>${descCompletaPdf}</span></div>
                             <div class="dado-item"><strong>Nota Fiscal</strong><span>${nf}</span></div>
                             <div class="dado-item"><strong>Data de Emissão</strong><span>${dataNf}</span></div>
-                            <div class="dado-item"><strong>Número do Lote</strong><span>${lotes[i]}</span></div>
+                            <div class="dado-item"><strong>Número do Lote</strong><span>${registroAtual.lote}</span></div>
                             <div class="dado-item"><strong>Quantidade (TN)</strong><span>${tonExibicao} Toneladas</span></div>
                         </div>
                         <table style="font-family: Arial, sans-serif;">
@@ -447,6 +628,96 @@
             document.getElementById('tabsMenu').style.display = "block";
             await atualizarStatus("✨ Sucesso! Acesse as abas para Gerar o E-mail ou Imprimir.", false);
             
+            abrirAba('tabVerificacao', document.querySelectorAll('.tab-btn')[1]);
+        }
+        async function processarNfPorPagina(texto, textosPaginas = [texto]) {
+            await atualizarStatus("🔍 Buscando Lotes e cruzando dados...");
+
+            const textoLimpo = normalizarTextoPdf(texto);
+            const contextoGlobal = montarContextoGlobal(texto, textoLimpo);
+            const registrosLaudo = montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal);
+            const primeiroRegistro = registrosLaudo[0] || null;
+
+            window.numeroNfAtual = primeiroRegistro ? primeiroRegistro.nf : (contextoGlobal.nfs[0] || "---");
+
+            if (primeiroRegistro && primeiroRegistro.lote && primeiroRegistro.lote !== "---") {
+                document.getElementById('vLote').value = primeiroRegistro.lote;
+            }
+            if (primeiroRegistro && primeiroRegistro.fab && primeiroRegistro.fab !== "---") {
+                document.getElementById('vFab').value = primeiroRegistro.fab;
+            }
+            if (primeiroRegistro && primeiroRegistro.val && primeiroRegistro.val !== "---") {
+                document.getElementById('vVal').value = primeiroRegistro.val;
+            }
+
+            const area = document.getElementById('containerLaudos');
+            area.innerHTML = "";
+
+            if (registrosLaudo.length === 0) {
+                await atualizarStatus("⚠️ Nenhum lote encontrado. Verifique o PDF.", false);
+                return;
+            }
+
+            for (let i = 0; i < registrosLaudo.length; i++) {
+                const registroAtual = registrosLaudo[i];
+                const loteParaConsulta = registroAtual.lote && registroAtual.lote !== "---" ? registroAtual.lote.slice(-4) : "";
+                let dados = { dureza: "3,30", m4: 0, m10: 98.33, m18: 1.19, prato: 0.48 };
+
+                if (loteParaConsulta) {
+                    await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${registroAtual.lote}...`);
+
+                    try {
+                        const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${loteParaConsulta}'!A1:G20?key=${API_KEY}`);
+                        const json = await res.json();
+                        if (json.values) {
+                            const r = json.values.find(line => line[1] === "MÉDIA");
+                            if (r) {
+                                dados.dureza = r[2] || "3,30";
+                                dados.m4 = parseFloat((r[3] || "0").replace(',', '.'));
+                                dados.m10 = parseFloat((r[4] || "0").replace(',', '.'));
+                                dados.m18 = parseFloat((r[5] || "0").replace(',', '.'));
+                                dados.prato = (100 - (dados.m4 + dados.m10 + dados.m18)).toFixed(2);
+                            }
+                        }
+                    } catch (e) { }
+                }
+
+                area.innerHTML += `
+                    <div class="laudo-folha">
+                        <div class="topo-laudo">
+                            <img src="${LINK_LOGO}" class="img-logo">
+                            <h2 style="margin:0; font-size: 18px; text-transform:uppercase; font-family: Arial, sans-serif;">Boletim de Análise de Qualidade</h2>
+                        </div>
+                        <div class="grid-dados" style="font-family: Arial, sans-serif;">
+                            <div class="dado-item" style="grid-column: span 2;"><strong>Cliente / Destinatário</strong><span>${contextoGlobal.cliente}</span></div>
+                            <div class="dado-item" style="grid-column: span 2;"><strong>Descrição do Produto</strong><span>${contextoGlobal.descCompletaPdf}</span></div>
+                            <div class="dado-item"><strong>Nota Fiscal</strong><span>${registroAtual.nf}</span></div>
+                            <div class="dado-item"><strong>Data de Emissão</strong><span>${registroAtual.dataNf}</span></div>
+                            <div class="dado-item"><strong>Número do Lote</strong><span>${registroAtual.lote}</span></div>
+                            <div class="dado-item"><strong>Quantidade (TN)</strong><span>${registroAtual.quantidadeFormatada} Toneladas</span></div>
+                        </div>
+                        <table style="font-family: Arial, sans-serif;">
+                            <thead><tr><th>MALHA</th><th>ESPECIFICAÇÃO</th><th>RESULTADO</th></tr></thead>
+                            <tbody>
+                                <tr><td>MALHA 4</td><td>Máx 5%</td><td>${dados.m4.toFixed(2)}%</td></tr>
+                                <tr><td>MALHA 10</td><td>90 a 100%</td><td>${dados.m10.toFixed(2)}%</td></tr>
+                                <tr><td>MALHA 18</td><td>Máx 10%</td><td>${dados.m18.toFixed(2)}%</td></tr>
+                                <tr><td>PRATO</td><td>Máx 5%</td><td>${dados.prato}%</td></tr>
+                            </tbody>
+                        </table>
+                        <div style="font-size: 13px; font-family: Arial, sans-serif;"><strong>RESULTADO DURÔMETRO:</strong> ${dados.dureza}</div>
+                        <div class="rodape-discreto" style="font-family: Arial, sans-serif;">
+                            Responsável Técnico / Qualidade
+                            <b>Jhonantan Cardoso Gonçalves</b>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('areaAcoes').style.display = "flex";
+            document.getElementById('tabsMenu').style.display = "block";
+            await atualizarStatus("✨ Sucesso! Acesse as abas para Gerar o E-mail ou Imprimir.", false);
+
             abrirAba('tabVerificacao', document.querySelectorAll('.tab-btn')[1]);
         }
     </script>
