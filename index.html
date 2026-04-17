@@ -2,466 +2,138 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qualidade CYSY | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
-    
     <style>
-        /* --- PALETA JOVEM E VARIÁVEIS MODERNAS --- */
-        :root {
-            --grad-bg: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-            --grad-btn: linear-gradient(135deg, #6a5acd, #00c9ff);
-            --grad-btn-hover: linear-gradient(135deg, #00c9ff, #6a5acd);
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --text-dark: #2d3436;
-            --text-muted: #636e72;
-            --radius: 20px;
-            --shadow-float: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        }
-
-        * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--grad-bg); 
-            background-attachment: fixed;
-            color: var(--text-dark); 
-            padding: 40px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            margin: 0; 
-            min-height: 100vh;
-        }
-        
-        /* --- CARDS FLUTUANTES (GLASSMORPHISM) --- */
-        .card-glass { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            width: 100%; 
-            max-width: 900px; 
-            padding: 30px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow-float); 
-            border: 1px solid var(--glass-border);
-            margin-bottom: 25px; 
-            transition: transform 0.3s ease; 
-        }
-        .card-glass:hover { transform: translateY(-5px); }
-        
-        .header-title { 
-            margin-top: 0; font-size: 26px; color: #6a5acd; font-weight: 700; 
-            border-bottom: 2px solid rgba(106, 90, 205, 0.2); 
-            padding-bottom: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; 
-        }
-
-        /* --- SESSÕES E INPUTS --- */
-        .sessao { 
-            margin-bottom: 20px; padding: 20px; border-radius: 16px; 
-            background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8); transition: 0.3s; 
-        }
-        .sessao:hover { background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        label { font-weight: 600; display: block; margin-bottom: 8px; color: var(--text-dark); font-size: 15px; }
-        input[type="file"], input[type="text"] { 
-            width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 12px; 
-            background: rgba(255,255,255,0.8); font-size: 14px; font-family: 'Poppins', sans-serif; 
-            color: var(--text-dark); transition: 0.3s; outline: none; cursor: pointer;
-        }
-        input[type="text"]:focus { border-color: #00c9ff; box-shadow: 0 0 0 4px rgba(0, 201, 255, 0.2); background: white;}
-
-        /* --- CAIXA DE STATUS ANIMADA --- */
-        #caixaStatus { 
-            margin-top: 20px; padding: 15px; background: rgba(0, 201, 255, 0.15); 
-            border-radius: 12px; font-size: 16px; color: #005f73; font-weight: 600; 
-            text-align: center; border: 1px solid rgba(0, 201, 255, 0.3); transition: 0.4s;
-        }
-        .piscar { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.98); } }
-
-        /* --- ABAS MODERNAS (MODULAR) --- */
-        .tabs-container { width: 100%; max-width: 900px; margin-bottom: 25px; display: none; }
-        .tabs-nav { display: flex; gap: 10px; background: rgba(255,255,255,0.4); padding: 8px; border-radius: 16px; backdrop-filter: blur(10px); }
-        .tab-btn { 
-            flex: 1; padding: 14px; background: transparent; border: none; cursor: pointer; 
-            font-weight: 600; font-size: 15px; color: #636e72; border-radius: 12px; transition: all 0.3s ease; font-family: 'Poppins', sans-serif;
-        }
-        .tab-btn:hover { color: #6a5acd; background: rgba(255,255,255,0.5); }
-        .tab-btn.active { background: white; color: #6a5acd; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transform: translateY(-2px); }
-        
-        .tab-content { display: none; width: 100%; max-width: 900px; animation: slideUp 0.5s ease-out; }
-        .tab-content.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- BOTÕES OUSADOS --- */
-        .btn { 
-            padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
-            color: white; font-size: 16px; transition: transform 0.2s ease, box-shadow 0.3s ease; 
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Poppins', sans-serif;
-        }
-        .btn:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-        .btn:active { transform: scale(0.98); }
-        
-        .btn-acao { background: var(--grad-btn); width: 100%; margin-top: 20px; padding: 18px; font-size: 18px; }
-        .btn-acao:hover { background: var(--grad-btn-hover); }
-        .btn-print { background: linear-gradient(135deg, #11998e, #38ef7d); flex: 1; }
-        .btn-reset { background: linear-gradient(135deg, #ff416c, #ff4b2b); flex: 1; }
-        .acoes-topo { display: none; gap: 15px; width: 100%; max-width: 900px; margin-bottom: 25px; }
-
-        /* --- ABA 1: LAUDO (MANTIDO SÉRIO PARA IMPRESSÃO) --- */
-        .laudo-folha { 
-            background: white; width: 800px; padding: 50px; margin-bottom: 40px; 
-            border-top: 8px solid #00b894; box-shadow: var(--shadow-float); page-break-after: always; 
-            box-sizing: border-box; margin-left: auto; margin-right: auto; border-radius: 8px; font-family: Arial, sans-serif;
-        }
-        .topo-laudo { text-align: center; border-bottom: 2px solid #333; margin-bottom: 25px; padding-bottom: 15px; }
-        .img-logo { max-height: 80px; margin-bottom: 15px; object-fit: contain; }
-        .grid-dados { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .dado-item { background: #fafafa; padding: 10px; border: 1px solid #eee; border-radius: 6px; }
-        .dado-item strong { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px;}
-        .dado-item span { font-size: 13px; font-weight: 700; color: #222; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 13px; }
-        th { background: #f8f9fa; color: #444; }
-        .rodape-discreto { margin-top: 50px; text-align: right; border-top: 1px solid #eee; padding-top: 15px; font-size: 12px; color: #777; }
-        .rodape-discreto b { color: #222; font-size: 14px; display: block; margin-top: 4px; }
-
-        /* --- ABA 2: VERIFICAÇÃO NF --- */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group.full { grid-column: span 2; }
-
-        /* --- ABA 3: E-MAIL --- */
-        .email-box { 
-            background: rgba(255,255,255,0.9); padding: 25px; border: 1px solid #ddd; 
-            border-radius: 16px; white-space: pre-wrap; font-family: 'Courier New', monospace; 
-            font-size: 15px; margin-top: 20px; color: #2d3436; line-height: 1.6; 
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); border-left: 5px solid #00c9ff;
-        }
-        .app-version {
-            width: 100%;
-            max-width: 900px;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(45, 52, 54, 0.75);
-            margin-top: 6px;
-            margin-bottom: 12px;
-            letter-spacing: 0.08em;
-            font-weight: 600;
-        }
-
-        /* --- MODO IMPRESSÃO (REMOVE O DESIGN FUTURISTA E DEIXA SÓ O LAUDO BRANCO) --- */
-        @media print { 
-            body { padding: 0; background: white; align-items: flex-start; }
-            .card-glass, .acoes-topo, .tabs-container { display: none !important; } 
-            .tab-content { display: block !important; animation: none;}
-            .laudo-folha { box-shadow: none; border-top-width: 6px; margin: 0; width: 100%; border-radius: 0; padding: 20px;} 
-            #tabVerificacao, #tabEmail { display: none !important; }
-        }
+        :root{--bg:linear-gradient(135deg,#f5d0fe 0%,#bfdbfe 100%);--card:rgba(255,255,255,.8);--line:rgba(255,255,255,.55);--text:#1f2937;--muted:#6b7280;--blue:#2563eb;--teal:#0f766e;--green:#047857;--orange:#b45309;--red:#b91c1c;--shadow:0 18px 40px rgba(15,23,42,.12)}
+        *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px 16px 18px;font-family:Poppins,sans-serif;background:var(--bg);background-attachment:fixed;color:var(--text);display:flex;flex-direction:column;align-items:center}
+        .card,.tab-card{width:100%;max-width:980px;background:var(--card);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:20px;box-shadow:var(--shadow)}
+        .card{padding:26px;margin-bottom:18px}.hero{display:flex;justify-content:space-between;gap:18px;align-items:center;padding-bottom:18px;border-bottom:1px solid rgba(99,102,241,.14)}
+        .hero h1{margin:0;font-size:28px;color:#4338ca}.hero p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.6;max-width:620px}.hero img{width:76px;height:76px;object-fit:contain;border-radius:18px;background:rgba(255,255,255,.85);padding:8px;box-shadow:0 10px 24px rgba(37,99,235,.16)}
+        .section{margin-top:22px;padding:18px;border-radius:18px;background:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.76)}label{display:block;margin-bottom:10px;font-size:14px;font-weight:600}
+        input[type=file],input[type=text]{width:100%;padding:14px 16px;border:1px solid rgba(148,163,184,.55);border-radius:14px;background:rgba(255,255,255,.95);font:14px Poppins,sans-serif;color:var(--text);outline:none}
+        input[type=file]:focus,input[type=text]:focus{border-color:rgba(37,99,235,.45);box-shadow:0 0 0 4px rgba(37,99,235,.14)}
+        #caixaStatus{margin-top:18px;padding:16px 18px;border-radius:16px;font-size:15px;font-weight:600;border:1px solid transparent;line-height:1.5}.info{background:rgba(6,182,212,.14);color:var(--teal);border-color:rgba(6,182,212,.22)}.ok{background:rgba(16,185,129,.14);color:var(--green);border-color:rgba(16,185,129,.22)}.warn{background:rgba(245,158,11,.14);color:var(--orange);border-color:rgba(245,158,11,.22)}.err{background:rgba(239,68,68,.14);color:var(--red);border-color:rgba(239,68,68,.22)}.pulse{animation:pulse 1.4s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.88;transform:scale(.992)}}
+        .actions,.tabs{width:100%;max-width:980px;display:none;margin-bottom:18px}.actions{gap:14px}.btn{border:0;border-radius:14px;padding:15px 22px;font:700 15px Poppins,sans-serif;color:#fff;cursor:pointer;transition:.2s}.btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(15,23,42,.12)}.btn:disabled{cursor:not-allowed;opacity:.55;transform:none;box-shadow:none}.print{flex:1;background:linear-gradient(135deg,#059669,#34d399)}.reset{flex:1;background:linear-gradient(135deg,#ef4444,#f97316)}.primary,.gmail{width:100%;margin-top:18px}.primary{background:linear-gradient(135deg,#2563eb,#0ea5e9)}.gmail{background:linear-gradient(135deg,#dc2626,#f97316)}
+        .tabs-nav{display:flex;gap:8px;padding:8px;border-radius:18px;background:rgba(255,255,255,.46);border:1px solid rgba(255,255,255,.55)}.tab-btn{flex:1;border:0;background:transparent;border-radius:12px;padding:14px;font:600 14px Poppins,sans-serif;color:var(--muted);cursor:pointer}.tab-btn.active{background:#fff;color:#4338ca;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+        .tab{width:100%;max-width:980px;display:none}.tab.active{display:block}.tab-card{padding:26px}.tab-card h3{margin:0 0 8px}.tab-card p{margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.7}
+        .grid,.laudo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.full{grid-column:span 2}.email-box{margin-top:18px;padding:22px;border-radius:18px;background:rgba(255,255,255,.95);border:1px solid rgba(148,163,184,.22);border-left:5px solid #38bdf8;box-shadow:inset 0 4px 12px rgba(15,23,42,.03);font:14px "Courier New",monospace;line-height:1.7;white-space:pre-wrap}
+        .laudo{width:800px;max-width:100%;background:#fff;margin:0 auto 28px;padding:46px;border-radius:10px;border-top:8px solid #14b8a6;box-shadow:0 20px 38px rgba(15,23,42,.12);page-break-after:always;font-family:Arial,sans-serif}.laudo-top{text-align:center;padding-bottom:16px;margin-bottom:24px;border-bottom:2px solid #374151}.laudo-top img{max-height:82px;margin-bottom:12px}.laudo-top h2{margin:0;font-size:18px;text-transform:uppercase}.laudo-grid{gap:12px;margin-bottom:24px}.item{border:1px solid #e5e7eb;background:#fafafa;border-radius:6px;padding:10px}.item strong{display:block;margin-bottom:4px;font-size:10px;text-transform:uppercase;color:#6b7280}.item span{font-size:13px;font-weight:700;color:#111827}
+        table{width:100%;border-collapse:collapse;margin-bottom:24px}th,td{border:1px solid #d1d5db;padding:10px;text-align:center;font-size:13px}th{background:#f3f4f6;color:#374151}.laudo-foot{margin-top:44px;padding-top:14px;border-top:1px solid #e5e7eb;text-align:right;color:#6b7280;font-size:12px}.laudo-foot b{display:block;margin-top:4px;font-size:14px;color:#111827}.version{width:100%;max-width:980px;text-align:center;color:rgba(31,41,55,.75);font-size:12px;font-weight:600;letter-spacing:.08em;margin-top:4px}
+        @media (max-width:840px){body{padding-top:20px}.card,.tab-card{padding:20px}.hero{flex-direction:column;align-items:flex-start}.hero img{width:64px;height:64px}.actions{flex-direction:column}.tabs-nav,.grid,.laudo-grid{grid-template-columns:1fr;display:grid}.full{grid-column:span 1}.laudo{padding:24px}}
+        @media print{body{padding:0;background:#fff;align-items:flex-start}.card,.actions,.tabs,#tabVerificacao,#tabEmail,.version{display:none!important}.tab{display:block!important}.laudo{width:100%;box-shadow:none;border-radius:0;margin:0;padding:22px}}
     </style>
 </head>
 <body>
-
-    <div class="card-glass" id="painelPrincipal">
-        <div class="header-title">
-            <span>✨ Quality Dashboard</span>
-            <img id="logoPreviewApp" src="https://drive.google.com/uc?id=1lTjM10UgPWuvbFYRGjSy2GP9T4FazkvV" style="height: 45px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        </div>
-        
-        <div class="sessao">
-            <label>📑 Selecionar Nota Fiscal (PDF)</label>
-            <input type="file" id="fNf" accept="application/pdf">
-        </div>
-        
-        <div id="caixaStatus">Pronto. Aguardando a magia acontecer... 🚀</div>
-    </div>
-
-    <div class="acoes-topo" id="areaAcoes">
-        <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir Laudos</button>
-        <button class="btn btn-reset" onclick="location.reload()">🔄 Analisar Nova NF</button>
-    </div>
-
-    <div class="tabs-container" id="tabsMenu">
-        <div class="tabs-nav">
-            <button class="tab-btn active" onclick="abrirAba('tabLaudo', this)">📄 Aba 1 - Laudo</button>
-            <button class="tab-btn" onclick="abrirAba('tabVerificacao', this)">📝 Aba 2 - Verificação da NF</button>
-            <button class="tab-btn" onclick="abrirAba('tabEmail', this)">🚀 Aba 3 - E-mail Automático</button>
-        </div>
-    </div>
-
-    <div id="tabLaudo" class="tab-content active">
-        <div id="containerLaudos"></div>
-    </div>
-
-    <div id="tabVerificacao" class="tab-content">
-        <div class="card-glass">
-            <h3 style="margin-top: 0; color: #6a5acd; font-size: 22px;">📝 Verificação e Correção (NF)</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 25px;">Os dados abaixo foram pré-preenchidos com base no padrão. O <b>Lote, Fabricação e Validade</b> foram extraídos do PDF. Revise antes de gerar o e-mail!</p>
-            
-            <div class="form-grid">
-                <div class="form-group full">
-                    <label>Produto</label>
-                    <input type="text" id="vProduto" value="FERTILIZANTE MINERAL MISTO CYSY+S BIG BAG CARBONATO DE CALCIO E SULFATO DE CALCIO">
-                </div>
-                <div class="form-group">
-                    <label>Registro MAPA</label>
-                    <input type="text" id="vMapa" value="SC-002057">
-                </div>
-                <div class="form-group">
-                    <label>Quantidade</label>
-                    <input type="text" id="vQtd" value="5.000 002">
-                </div>
-                <div class="form-group">
-                    <label>Forma</label>
-                    <input type="text" id="vForma" value="GRANULADO">
-                </div>
-                <div class="form-group">
-                    <label>Composição</label>
-                    <input type="text" id="vComposicao" value="25% CA E 6% S TOTAL">
-                </div>
-                <div class="form-group full">
-                    <label>Uso</label>
-                    <input type="text" id="vUso" value="PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA">
-                </div>
-                <div class="form-group">
-                    <label>Lote Extraído</label>
-                    <input type="text" id="vLote" value="">
-                </div>
-                <div class="form-group">
-                    <label>Fabricação Extraída</label>
-                    <input type="text" id="vFab" value="">
-                </div>
-                <div class="form-group">
-                    <label>Validade Extraída</label>
-                    <input type="text" id="vVal" value="">
-                </div>
+    <div class="card">
+        <div class="hero">
+            <div>
+                <h1>Quality Dashboard</h1>
+                <p>Leitura de nota fiscal em PDF, cruzamento por página, consulta do lote e geração do laudo com e-mail pronto.</p>
             </div>
-
-            <button class="btn btn-acao" onclick="validarEGerarEmail()">✨ Validar Dados e Gerar E-mail Automático</button>
+            <img src="logo.png.png" alt="Logo CYSY">
+        </div>
+        <div class="section">
+            <label for="fNf">Selecionar Nota Fiscal (PDF)</label>
+            <input type="file" id="fNf" accept="application/pdf">
+            <div id="caixaStatus" class="info">Pronto para processar a nota fiscal.</div>
         </div>
     </div>
 
-    <div id="tabEmail" class="tab-content">
-        <div class="card-glass">
-            <h3 style="margin-top: 0; color: #00c9ff; font-size: 22px;">🚀 E-mail Pronto para Envio</h3>
-            <p style="font-size: 15px; color: var(--text-muted);">Tudo certo! Clique no botão abaixo. O sistema copiará o texto e abrirá o seu Gmail. <strong>Basta colar (Ctrl+V) no corpo da mensagem para manter a sua assinatura de imagem intacta!</strong></p>
-            
-            <button class="btn btn-acao" onclick="abrirGmailComAssinatura()" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">✉️ Abrir Diretamente no Gmail</button>
-            
-            <div class="email-box" id="corpoEmail">O texto do e-mail aparecerá aqui após você clicar em "Validar Dados" na Aba 2.</div>
+    <div class="actions" id="areaAcoes">
+        <button class="btn print" id="btnPrint" type="button">Imprimir laudos</button>
+        <button class="btn reset" id="btnReset" type="button">Analisar nova NF</button>
+    </div>
+
+    <div class="tabs" id="tabsMenu">
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tabLaudo" type="button">Aba 1 - Laudo</button>
+            <button class="tab-btn" data-tab="tabVerificacao" type="button">Aba 2 - Verificação da NF</button>
+            <button class="tab-btn" data-tab="tabEmail" type="button">Aba 3 - E-mail Automático</button>
         </div>
     </div>
 
-    <div class="app-version">V 1.4</div>
+    <div class="tab active" id="tabLaudo"><div id="containerLaudos"></div></div>
+
+    <div class="tab" id="tabVerificacao">
+        <div class="tab-card">
+            <h3 style="color:#4338ca">Verificação e correção</h3>
+            <p>Os campos abaixo são preenchidos automaticamente com base no PDF. Revise antes de gerar o e-mail.</p>
+            <div class="grid">
+                <div class="full"><label for="vProduto">Produto</label><input type="text" id="vProduto" value="FERTILIZANTE MINERAL MISTO CYSY+S BIG BAG CARBONATO DE CALCIO E SULFATO DE CALCIO"></div>
+                <div><label for="vMapa">Registro MAPA</label><input type="text" id="vMapa" value="SC-002057"></div>
+                <div><label for="vQtd">Quantidade</label><input type="text" id="vQtd" value="5.000 002"></div>
+                <div><label for="vForma">Forma</label><input type="text" id="vForma" value="GRANULADO"></div>
+                <div><label for="vComposicao">Composição</label><input type="text" id="vComposicao" value="25% CA E 6% S TOTAL"></div>
+                <div class="full"><label for="vUso">Uso</label><input type="text" id="vUso" value="PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA"></div>
+                <div><label for="vLote">Lote extraído</label><input type="text" id="vLote" value=""></div>
+                <div><label for="vFab">Fabricação extraída</label><input type="text" id="vFab" value=""></div>
+                <div><label for="vVal">Validade extraída</label><input type="text" id="vVal" value=""></div>
+            </div>
+            <button class="btn primary" id="btnGerarEmail" type="button">Validar dados e gerar e-mail</button>
+        </div>
+    </div>
+
+    <div class="tab" id="tabEmail">
+        <div class="tab-card">
+            <h3 style="color:#0ea5e9">E-mail pronto para envio</h3>
+            <p>O Gmail será aberto com assunto e corpo preenchidos. O texto também é copiado para a área de transferência quando o navegador permitir.</p>
+            <button class="btn gmail" id="btnAbrirGmail" type="button">Abrir diretamente no Gmail</button>
+            <div class="email-box" id="corpoEmail">O texto do e-mail aparecerá aqui após a validação da nota fiscal.</div>
+        </div>
+    </div>
+
+    <div class="version">V 1.5</div>
 
     <script>
-        const API_KEY = "AIzaSyAdzZznAPDRlGLqbT-8AAVSKslZYfr7Jc0";
-        const SHEET_ID = "1o0t2cB0CIG2_3d1c4OBjwlE4czu4AdJIKbYQM6WlPcA";
-        const LINK_LOGO = "https://raw.githubusercontent.com/Jhonantan-CGS/Atualiza-o-automatica-de-L-udo/main/logo.png.png";
-        let emailAssuntoFinal = "";
-        let emailCorpoFinal = "";
-        let emailDestinatario = "eng.agronomamatriz@cysy.com.br";
+        const CFG={apiKey:"AIzaSyAdzZznAPDRlGLqbT-8AAVSKslZYfr7Jc0",sheetId:"1o0t2cB0CIG2_3d1c4OBjwlE4czu4AdJIKbYQM6WlPcA",logo:"logo.png.png",emailTo:"eng.agronomamatriz@cysy.com.br",t:{file:15000,pdf:15000,page:12000,lot:8000,flow:60000}};
+        const DEF={dureza:"3,30",m4:0,m10:98.33,m18:1.19,prato:"0.48"};
+        const S={busy:false,run:0,emailTo:CFG.emailTo,emailSubject:"",emailBody:"",records:[],global:null,cache:new Map(),logs:[]};
+        const E={file:document.getElementById("fNf"),status:document.getElementById("caixaStatus"),actions:document.getElementById("areaAcoes"),tabsMenu:document.getElementById("tabsMenu"),tabs:[...document.querySelectorAll(".tab-btn")],panels:[...document.querySelectorAll(".tab")],laudos:document.getElementById("containerLaudos"),print:document.getElementById("btnPrint"),reset:document.getElementById("btnReset"),email:document.getElementById("corpoEmail"),generate:document.getElementById("btnGerarEmail"),gmail:document.getElementById("btnAbrirGmail"),f:{produto:document.getElementById("vProduto"),mapa:document.getElementById("vMapa"),qtd:document.getElementById("vQtd"),forma:document.getElementById("vForma"),composicao:document.getElementById("vComposicao"),uso:document.getElementById("vUso"),lote:document.getElementById("vLote"),fab:document.getElementById("vFab"),val:document.getElementById("vVal")}};
+        if(window.pdfjsLib&&pdfjsLib.GlobalWorkerOptions)pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js";
+        window.__qualidadeDashboard=S;
 
-        function abrirAba(nomeAba, elementoBtn) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(nomeAba).classList.add('active');
-            elementoBtn.classList.add('active');
-        }
+        const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+        const err=(code,msg,details={})=>Object.assign(new Error(msg),{code,userMessage:msg,details});
+        const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+        const strip=v=>String(v==null?"":v).normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+        const num=v=>{if(!v)return null;const n=Number.parseFloat(String(v).replace(/\s+/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",", "."));return Number.isFinite(n)?n:null};
+        const ton=v=>{const n=typeof v==="number"?v:num(v);return Number.isFinite(n)?n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"---"};
+        const greet=()=>new Date().getHours()<12?"Bom dia!":new Date().getHours()<18?"Boa tarde!":"Boa noite!";
+        const first=(text,patterns)=>{for(const p of patterns){const m=text.match(p);if(m&&m[1])return m[1].trim()}return""};
+        const pick=(items,field)=>{const found=items.find(item=>item&&item[field]);return found?found[field]:""};
 
-        const caixaStatus = document.getElementById('caixaStatus');
-        async function atualizarStatus(mensagem, animar = true) {
-            caixaStatus.innerHTML = mensagem;
-            if (animar) {
-                caixaStatus.classList.add('piscar');
-                caixaStatus.style.background = "rgba(0, 201, 255, 0.15)";
-                caixaStatus.style.borderColor = "rgba(0, 201, 255, 0.3)";
-                caixaStatus.style.color = "#005f73";
-            } else {
-                caixaStatus.classList.remove('piscar');
-                caixaStatus.style.background = "rgba(16, 185, 129, 0.15)";
-                caixaStatus.style.borderColor = "rgba(16, 185, 129, 0.3)";
-                caixaStatus.style.color = "#065f46";
-            }
-            await new Promise(r => setTimeout(r, 50));
-        }
+        function log(step,details={},level="info"){const entry={timestamp:new Date().toISOString(),step,details};S.logs.push(entry);window.__qualidadeDashboard=S;(console[level]||console.log)(`[QUALITY FLOW] ${step}`,details)}
+        async function status(msg,type="info",pulse=true){E.status.textContent=msg;E.status.className=type+(pulse?" pulse":"");await sleep(20)}
+        function openTab(id){E.panels.forEach(p=>p.classList.toggle("active",p.id===id));E.tabs.forEach(b=>b.classList.toggle("active",b.dataset.tab===id))}
+        function resetUi(){E.laudos.innerHTML="";E.tabsMenu.style.display="none";E.actions.style.display="none";E.print.disabled=true;E.email.textContent='O texto do e-mail aparecerá aqui após a validação da nota fiscal.';S.emailSubject="";S.emailBody="";S.records=[];S.global=null;openTab("tabLaudo")}
+        function finishRun(run){if(S.run!==run)return;S.busy=false;E.file.disabled=false;E.file.value=""}
+        function validateFile(file){if(!file)throw err("FILE_MISSING","Nenhum arquivo foi selecionado.");if(!/\.pdf$/i.test(file.name))throw err("FILE_INVALID","Selecione um arquivo PDF válido.")}
+        function normalize(text){let t=strip(text).replace(/\r|\n/g," ").replace(/\s+/g," ").toUpperCase().trim();[["V ALIDADE","VALIDADE"],["FABR ICACAO","FABRICACAO"],["CHA VE","CHAVE"],["V ALOR","VALOR"],["CARBONA TO","CARBONATO"],["COOPA VEL","COOPAVEL"],["BIG BAG 0CARBONATO","BIG BAG CARBONATO"],["-V ALIDADE","- VALIDADE"],["PROD./SERV .","PROD./SERV."]].forEach(([a,b])=>t=t.replaceAll(a,b));return t}
+        function readPage(raw,index){const t=normalize(raw);const data={index,t,len:t.length,invoice:first(t,[/NF-E\s*N\.\s*0*(\d{4,9})/i,/N\.\s*0*(\d{4,9})\s*SERIE/i]),date:first(t,[/DATA DE EMISSAO\s*(\d{2}\/\d{2}\/\d{4})/i,/EMISSAO\s*(\d{2}\/\d{2}\/\d{4})/i]),lot:first(t,[/LOTE\s*[:\-]?\s*([A-Z0-9]+)/i]),qty:first(t,[/\b(?:TO|TN|TON|TONELADAS?)\s*(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\b/i,/\b(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\s*(?:TO|TN|TON|TONELADAS?)\b/i,/QUANTIDADE\s*(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)(?=\s+ESPECIE|\s+PESO)/i,/QTD(?:ADE)?\s*(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)/i]),fab:first(t,[/FABRICACAO\s*[:\-]?\s*(\d{2}\/\d{4})/i,/FABRICACAO\s*[:\-]?\s*(\d{2}\/\d{2}\/\d{4})/i]),val:first(t,[/VALIDADE\s*[:\-]?\s*(\d{2}\/\d{4})/i,/VALIDADE\s*[:\-]?\s*(\d{2}\/\d{2}\/\d{4})/i]),client:first(t,[/NOME\/RAZAO SOCIAL\s+(.*?)(?:\s+CNPJ\/CPF|\s+ENDERECO)/i]),desc:first(t,[/(FERTILIZANTE.*?PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA)/i,/(FERTILIZANTE.*?AGRICULTURA)/i])};log("page_analyzed",{page:index+1,invoice:data.invoice,date:data.date,lot:data.lot,qty:data.qty,fab:data.fab,val:data.val,len:data.len});return data}
+        function globalData(pages){const merged=pages.map(p=>p.t).join(" ");const g={client:pick(pages,"client")||first(merged,[/NOME\/RAZAO SOCIAL\s+(.*?)(?:\s+CNPJ\/CPF|\s+ENDERECO)/i])||"---",desc:pick(pages,"desc")||first(merged,[/(FERTILIZANTE.*?PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA)/i,/(FERTILIZANTE.*?AGRICULTURA)/i])||E.f.produto.value,fab:pick(pages,"fab")||first(merged,[/FABRICACAO\s*[:\-]?\s*(\d{2}\/\d{4})/i]),val:pick(pages,"val")||first(merged,[/VALIDADE\s*[:\-]?\s*(\d{2}\/\d{4})/i])};log("global_context",g);return g}
+        function buildRecords(pages,g){const recs=pages.filter(p=>p.len>0).map(p=>({pageIndex:p.index,invoice:p.invoice||"---",date:p.date||"---",lot:p.lot||"---",qtyRaw:p.qty||"",qtyFmt:ton(p.qty),fab:p.fab||g.fab||"---",val:p.val||g.val||"---"})).filter(r=>r.invoice!=="---"||r.lot!=="---"||r.qtyRaw);log("records_built",{count:recs.length,records:recs.map(r=>({page:r.pageIndex+1,invoice:r.invoice,lot:r.lot,qty:r.qtyRaw,fmt:r.qtyFmt}))});if(!recs.length)throw err("NO_RECORDS","Nenhum dado válido foi encontrado no PDF selecionado.");return recs}
+        function fillVerify(r,g){if(r.lot&&r.lot!=="---")E.f.lote.value=r.lot;if(r.fab&&r.fab!=="---")E.f.fab.value=r.fab;if(r.val&&r.val!=="---")E.f.val.value=r.val;if(g.desc&&g.desc!=="---")E.f.produto.value=g.desc}
+        async function timed(label,ms,job){return await new Promise((resolve,reject)=>{let done=false;const id=setTimeout(()=>{if(done)return;done=true;reject(err("TIMEOUT",`${label} excedeu o tempo limite.`,{label,ms}))},ms);Promise.resolve().then(job).then(v=>{if(done)return;done=true;clearTimeout(id);resolve(v)}).catch(e=>{if(done)return;done=true;clearTimeout(id);reject(e)})})}
+        async function readPdf(file){validateFile(file);if(!window.pdfjsLib||typeof pdfjsLib.getDocument!=="function")throw err("PDFJS_MISSING","A biblioteca de leitura de PDF não foi carregada.");await status("Lendo o arquivo PDF...","info",true);const buf=await timed("Leitura do arquivo",CFG.t.file,()=>file.arrayBuffer());log("file_read",{bytes:buf.byteLength,fileName:file.name});await status("Abrindo o PDF...","info",true);const pdf=await timed("Abertura do PDF",CFG.t.pdf,()=>pdfjsLib.getDocument({data:new Uint8Array(buf)}).promise);if(!pdf||!Number.isFinite(pdf.numPages)||pdf.numPages<=0)throw err("PDF_INVALID","O PDF não possui páginas válidas para leitura.");log("pdf_opened",{pages:pdf.numPages});const pages=[];for(let i=1;i<=pdf.numPages;i++){await status(`Extraindo texto da página ${i}/${pdf.numPages}...`,"info",true);const page=await timed(`Leitura da página ${i}`,CFG.t.page,()=>pdf.getPage(i));const content=await timed(`Extração do texto da página ${i}`,CFG.t.page,()=>page.getTextContent());const items=Array.isArray(content.items)?content.items:[];const text=items.map(it=>it.str||"").join(" ").trim();log("page_extracted",{page:i,items:items.length,length:text.length,sample:text.slice(0,180)});pages.push(text)}if(!pages.some(t=>t.trim()))throw err("PDF_EMPTY","Não foi possível extrair texto útil do PDF selecionado.");return pages}
+        async function lotData(lot){if(!lot||lot==="---"){log("lot_skipped",{lot},"warn");return {...DEF}}const key=lot.slice(-4);if(S.cache.has(key)){log("lot_cache_hit",{lot,key});return S.cache.get(key)}const url=`https://sheets.googleapis.com/v4/spreadsheets/${CFG.sheetId}/values/'LOTE ${key}'!A1:G20?key=${CFG.apiKey}`;const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),CFG.t.lot);try{const res=await fetch(url,{signal:controller.signal});if(!res.ok)throw err("LOT_HTTP",`A consulta do lote retornou HTTP ${res.status}.`,{status:res.status,url});const json=await res.json();const rows=Array.isArray(json.values)?json.values:[];const row=rows.find(line=>normalize(String(line&&line[1]?line[1]:""))==="MEDIA");if(!row){log("lot_media_missing",{lot,key,rows:rows.length},"warn");S.cache.set(key,{...DEF});return S.cache.get(key)}const m4=num(row[3]),m10=num(row[4]),m18=num(row[5]);const data={dureza:row[2]||DEF.dureza,m4:m4===null?DEF.m4:m4,m10:m10===null?DEF.m10:m10,m18:m18===null?DEF.m18:m18};data.prato=(100-(data.m4+data.m10+data.m18)).toFixed(2);S.cache.set(key,data);log("lot_fetched",{lot,key,data});return data}catch(e){log("lot_failed",{lot,key,code:e.code||e.name||"ERR",message:e.message},"warn");const fallback={...DEF};S.cache.set(key,fallback);return fallback}finally{clearTimeout(timer)}}
+        function render(recs,g,analyses){E.laudos.innerHTML=recs.map((r,i)=>{const a=analyses[i]||DEF;return `<div class="laudo"><div class="laudo-top"><img src="${esc(CFG.logo)}" alt="Logo CYSY"><h2>Boletim de Análise de Qualidade</h2></div><div class="laudo-grid"><div class="item full"><strong>Cliente / Destinatário</strong><span>${esc(g.client)}</span></div><div class="item full"><strong>Descrição do Produto</strong><span>${esc(g.desc)}</span></div><div class="item"><strong>Nota Fiscal</strong><span>${esc(r.invoice)}</span></div><div class="item"><strong>Data de Emissão</strong><span>${esc(r.date)}</span></div><div class="item"><strong>Número do Lote</strong><span>${esc(r.lot)}</span></div><div class="item"><strong>Quantidade (TN)</strong><span>${esc(r.qtyFmt)} Toneladas</span></div></div><table><thead><tr><th>MALHA</th><th>ESPECIFICAÇÃO</th><th>RESULTADO</th></tr></thead><tbody><tr><td>MALHA 4</td><td>Máx 5%</td><td>${a.m4.toFixed(2)}%</td></tr><tr><td>MALHA 10</td><td>90 a 100%</td><td>${a.m10.toFixed(2)}%</td></tr><tr><td>MALHA 18</td><td>Máx 10%</td><td>${a.m18.toFixed(2)}%</td></tr><tr><td>PRATO</td><td>Máx 5%</td><td>${esc(a.prato)}%</td></tr></tbody></table><div style="font-size:13px"><strong>RESULTADO DURÔMETRO:</strong> ${esc(a.dureza)}</div><div class="laudo-foot">Responsável Técnico / Qualidade<b>Jhonantan Cardoso Gonçalves</b></div></div>`}).join("")}
+        function buildEmail(){const produto=E.f.produto.value.trim(),mapa=E.f.mapa.value.trim(),qtd=E.f.qtd.value.trim(),forma=E.f.forma.value.trim(),comp=E.f.composicao.value.trim(),uso=E.f.uso.value.trim(),lote=E.f.lote.value.trim(),fab=E.f.fab.value.trim(),val=E.f.val.value.trim();if(!produto||!lote||!fab||!val)throw err("EMAIL_FIELDS","Revise os campos obrigatórios antes de gerar o e-mail.");S.emailSubject="Emissão de Certificado de Análise - Coopavel";S.emailBody=`${greet()}\n\nSegue lote para emissão de certificado de análise, Coopavel.\n\n${produto} - REG. MAPA ${mapa} - ${qtd} - ${forma} - ${comp} - ${uso} - LOTE: ${lote} - FABRICAÇÃO: ${fab} - VALIDADE: ${val}`;E.email.textContent=`Para: ${S.emailTo}\nAssunto: ${S.emailSubject}\n\n----------------------------------------------------\n\n${S.emailBody}`;log("email_built",{lot,subject:S.emailSubject})}
+        async function openGmail(){if(!S.emailBody)throw err("EMAIL_EMPTY","Gere o e-mail na Aba 2 antes de abrir o Gmail.");const url=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(S.emailTo)}&su=${encodeURIComponent(S.emailSubject)}&body=${encodeURIComponent(S.emailBody)}`;try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(S.emailBody)}catch(e){log("clipboard_failed",{message:e.message},"warn")}window.open(url,"_blank","noopener")}
+        async function processFile(file){if(S.busy){await status("Já existe um processamento em andamento. Aguarde a conclusão.","warn",false);return}const run=++S.run;S.busy=true;E.file.disabled=true;resetUi();try{await status("Iniciando processamento do PDF...","info",true);const pageTexts=await timed("Processamento completo da nota fiscal",CFG.t.flow,()=>readPdf(file));const pages=pageTexts.map((text,i)=>readPage(text,i));const g=globalData(pages);const recs=buildRecords(pages,g);S.global=g;S.records=recs;fillVerify(recs[0],g);const analyses=[];for(let i=0;i<recs.length;i++){await status(`Consultando resultados do lote ${recs[i].lot} (${i+1}/${recs.length})...`,"info",true);analyses.push(await lotData(recs[i].lot))}await status("Renderizando laudos...","info",true);render(recs,g,analyses);E.tabsMenu.style.display="block";E.actions.style.display="flex";E.print.disabled=false;await status("Processamento concluído com sucesso. As abas já estão liberadas.","ok",false);openTab("tabVerificacao")}catch(e){const msg=e.userMessage||e.message||"Ocorreu um erro inesperado durante o processamento.";log("process_failed",{code:e.code||"UNKNOWN",message:msg,details:e.details||null},"error");await status(msg,"err",false);resetUi()}finally{finishRun(run)}}
 
-        document.getElementById('fNf').onchange = async e => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            document.getElementById('containerLaudos').innerHTML = "";
-            document.getElementById('areaAcoes').style.display = "none";
-            document.getElementById('tabsMenu').style.display = "none";
-
-            await atualizarStatus("⏳ Analisando PDF de forma inteligente...");
-            
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            let texto = "";
-            
-            for(let i=1; i<=pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                texto += content.items.map(it => it.str).join(' ');
-            }
-            
-            await processarNf(texto);
-        };
-
-        function obterSaudacao() {
-            const hora = new Date().getHours();
-            if (hora >= 0 && hora < 12) return "Bom dia!";
-            if (hora >= 12 && hora < 18) return "Boa tarde!";
-            return "Boa noite!";
-        }
-
-        // --- GERAÇÃO DO EMAIL (A PARTIR DA ABA 2) ---
-        function validarEGerarEmail() {
-            const nf = window.numeroNfAtual || "00000";
-            
-            // Pega exatamente o que está preenchido nos inputs da Aba 2
-            const produto = document.getElementById('vProduto').value;
-            const mapa = document.getElementById('vMapa').value;
-            const qtd = document.getElementById('vQtd').value;
-            const forma = document.getElementById('vForma').value;
-            const comp = document.getElementById('vComposicao').value;
-            const uso = document.getElementById('vUso').value;
-            const lote = document.getElementById('vLote').value;
-            const fab = document.getElementById('vFab').value;
-            const val = document.getElementById('vVal').value;
-            
-            const saudacao = obterSaudacao();
-
-            // Formatação estrita exigida
-            emailAssuntoFinal = `Emissão de Certificado de Análise - Coopavel`;
-            
-            emailCorpoFinal = `${saudacao}\n\nSegue lote para emissão de certificado de análise, Coopavel.\n\n${produto} - REG. MAPA ${mapa} - ${qtd} - ${forma} - ${comp} - ${uso} - LOTE: ${lote} - FABRICAÇÃO: ${fab} - VALIDADE: ${val}`;
-
-            document.getElementById('corpoEmail').innerText = `Para: ${emailDestinatario}\nAssunto: ${emailAssuntoFinal}\n\n----------------------------------------------------\n\n${emailCorpoFinal}`;
-            
-            // Pula para a Aba 3
-            abrirAba('tabEmail', document.querySelectorAll('.tab-btn')[2]);
-        }
-
-        function abrirGmailComAssinatura() {
-            navigator.clipboard.writeText(emailCorpoFinal).then(() => {
-                const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${emailDestinatario}&su=${encodeURIComponent(emailAssuntoFinal)}`;
-                window.open(urlGmail, '_blank');
-            }).catch(err => {
-                alert("Falha ao copiar automaticamente. Copie o texto da tela.");
-            });
-        }
-
-        async function processarNf(texto) {
-            await atualizarStatus("🔍 Buscando Lotes e cruzando dados...");
-            
-            let textoLimpo = texto.replace(/\s+/g, ' ').toUpperCase();
-            textoLimpo = textoLimpo.replace(/CA LCIO/g, 'CALCIO').replace(/TOT AL/g, 'TOTAL').replace(/FABR ICACAO/g, 'FABRICACAO');
-
-            const nf = (textoLimpo.match(/N[.\sº]*0*(\d{4,9})/i) || ["","---"])[1];
-            window.numeroNfAtual = nf; 
-            
-            const dataNf = (textoLimpo.match(/(\d{2}\/\d{2}\/\d{4})/) || ["","---"])[1];
-            
-            let clienteRaw = texto.match(/NOME\/RAZ[ÃA]O SOCIAL\s+(.*?)(?:\s+ENDERE[ÇC]O|\s+CNPJ)/i);
-            const cliente = clienteRaw ? clienteRaw[1].trim() : "---";
-            
-            // Tenta pegar a descrição do PDF apenas para o Laudo
-            const descMatch = textoLimpo.match(/\d{5}\s+(FERTILIZANTE.*?AGRICULTURA)/i);
-            const descCompletaPdf = descMatch ? descMatch[1] : "FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS";
-            
-            const lotes = [];
-            const rLote = /LOTE[\s:]*([A-Z0-9]+)/gi;
-            let m;
-            while ((m = rLote.exec(textoLimpo)) !== null) { lotes.push(m[1]); }
-
-            const qtds = [];
-            const rQtd = /\b(\d{1,3},\d{4})(?!\d|,)/g;
-            while ((m = rQtd.exec(textoLimpo)) !== null) { qtds.push(m[1]); }
-
-            const fabMatch = textoLimpo.match(/FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i);
-            const valMatch = textoLimpo.match(/VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i);
-            
-            // PREENCHE A ABA 2 (Verificação) COM O QUE ENCONTROU NO PDF
-            if(lotes.length > 0) document.getElementById('vLote').value = lotes[0];
-            if(fabMatch) document.getElementById('vFab').value = fabMatch[1];
-            if(valMatch) document.getElementById('vVal').value = valMatch[1];
-
-            const area = document.getElementById('containerLaudos');
-            area.innerHTML = "";
-
-            if(lotes.length === 0) {
-                await atualizarStatus("⚠️ Nenhum lote encontrado. Verifique o PDF.", false);
-                return;
-            }
-
-            for(let i=0; i<lotes.length; i++) {
-                const final = lotes[i].slice(-4);
-                let dados = { dureza: "3,30", m4: 0, m10: 98.33, m18: 1.19, prato: 0.48 };
-
-                let tonExibicao = "---";
-                if (qtds[i]) {
-                    let numQuebrado = parseFloat(qtds[i].replace(',', '.'));
-                    tonExibicao = numQuebrado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                }
-
-                await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${lotes[i]}...`);
-
-                try {
-                    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${final}'!A1:G20?key=${API_KEY}`);
-                    const json = await res.json();
-                    if(json.values) {
-                        const r = json.values.find(line => line[1] === "MÉDIA");
-                        if(r) {
-                            dados.dureza = r[2] || "3,30";
-                            dados.m4 = parseFloat((r[3]||"0").replace(',','.'));
-                            dados.m10 = parseFloat((r[4]||"0").replace(',','.'));
-                            dados.m18 = parseFloat((r[5]||"0").replace(',','.'));
-                            dados.prato = (100 - (dados.m4 + dados.m10 + dados.m18)).toFixed(2);
-                        }
-                    }
-                } catch(e) { }
-
-                area.innerHTML += `
-                    <div class="laudo-folha">
-                        <div class="topo-laudo">
-                            <img src="${LINK_LOGO}" class="img-logo">
-                            <h2 style="margin:0; font-size: 18px; text-transform:uppercase; font-family: Arial, sans-serif;">Boletim de Análise de Qualidade</h2>
-                        </div>
-                        <div class="grid-dados" style="font-family: Arial, sans-serif;">
-                            <div class="dado-item" style="grid-column: span 2;"><strong>Cliente / Destinatário</strong><span>${cliente}</span></div>
-                            <div class="dado-item" style="grid-column: span 2;"><strong>Descrição do Produto</strong><span>${descCompletaPdf}</span></div>
-                            <div class="dado-item"><strong>Nota Fiscal</strong><span>${nf}</span></div>
-                            <div class="dado-item"><strong>Data de Emissão</strong><span>${dataNf}</span></div>
-                            <div class="dado-item"><strong>Número do Lote</strong><span>${lotes[i]}</span></div>
-                            <div class="dado-item"><strong>Quantidade (TN)</strong><span>${tonExibicao} Toneladas</span></div>
-                        </div>
-                        <table style="font-family: Arial, sans-serif;">
-                            <thead><tr><th>MALHA</th><th>ESPECIFICAÇÃO</th><th>RESULTADO</th></tr></thead>
-                            <tbody>
-                                <tr><td>MALHA 4</td><td>Máx 5%</td><td>${dados.m4.toFixed(2)}%</td></tr>
-                                <tr><td>MALHA 10</td><td>90 a 100%</td><td>${dados.m10.toFixed(2)}%</td></tr>
-                                <tr><td>MALHA 18</td><td>Máx 10%</td><td>${dados.m18.toFixed(2)}%</td></tr>
-                                <tr><td>PRATO</td><td>Máx 5%</td><td>${dados.prato}%</td></tr>
-                            </tbody>
-                        </table>
-                        <div style="font-size: 13px; font-family: Arial, sans-serif;"><strong>RESULTADO DURÔMETRO:</strong> ${dados.dureza}</div>
-                        <div class="rodape-discreto" style="font-family: Arial, sans-serif;">
-                            Responsável Técnico / Qualidade
-                            <b>Jhonantan Cardoso Gonçalves</b>
-                        </div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('areaAcoes').style.display = "flex";
-            document.getElementById('tabsMenu').style.display = "block";
-            await atualizarStatus("✨ Sucesso! Acesse as abas para Gerar o E-mail ou Imprimir.", false);
-            
-            abrirAba('tabVerificacao', document.querySelectorAll('.tab-btn')[1]);
-        }
+        E.tabs.forEach(b=>b.addEventListener("click",()=>openTab(b.dataset.tab)));
+        E.file.addEventListener("change",async ev=>{const file=ev.target.files[0];if(file)await processFile(file)});
+        E.print.addEventListener("click",()=>window.print());
+        E.reset.addEventListener("click",()=>window.location.reload());
+        E.generate.addEventListener("click",async()=>{try{buildEmail();openTab("tabEmail");await status("E-mail gerado com sucesso.","ok",false)}catch(e){log("email_failed",{message:e.message},"warn");await status(e.userMessage||e.message||"Não foi possível gerar o e-mail.","warn",false)}});
+        E.gmail.addEventListener("click",async()=>{try{await openGmail();await status("Gmail aberto com a mensagem preenchida.","ok",false)}catch(e){log("gmail_failed",{message:e.message},"warn");await status(e.userMessage||e.message||"Não foi possível abrir o Gmail.","warn",false)}});
+        window.addEventListener("error",ev=>log("window_error",{message:ev.message,file:ev.filename,line:ev.lineno,column:ev.colno},"error"));
+        window.addEventListener("unhandledrejection",ev=>{const reason=ev.reason||{};log("unhandled_rejection",{code:reason.code||null,message:reason.message||String(reason)},"error")});
     </script>
 </body>
 </html>
