@@ -5,9 +5,7 @@
     <title>Qualidade CYSY | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
-    
     <style>
-        /* --- PALETA JOVEM E VARIÁVEIS MODERNAS --- */
         :root {
             --grad-bg: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
             --grad-btn: linear-gradient(135deg, #6a5acd, #00c9ff);
@@ -19,155 +17,210 @@
             --radius: 20px;
             --shadow-float: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
-
         * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--grad-bg); 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--grad-bg);
             background-attachment: fixed;
-            color: var(--text-dark); 
-            padding: 40px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            margin: 0; 
+            color: var(--text-dark);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
             min-height: 100vh;
         }
-        
-        /* --- CARDS FLUTUANTES (GLASSMORPHISM) --- */
-        .card-glass { 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(12px); 
+        .card-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            width: 100%; 
-            max-width: 900px; 
-            padding: 30px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow-float); 
+            width: 100%;
+            max-width: 900px;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-float);
             border: 1px solid var(--glass-border);
-            margin-bottom: 25px; 
-            transition: transform 0.3s ease; 
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
         }
         .card-glass:hover { transform: translateY(-5px); }
-        
-        .header-title { 
-            margin-top: 0; font-size: 26px; color: #6a5acd; font-weight: 700; 
-            border-bottom: 2px solid rgba(106, 90, 205, 0.2); 
-            padding-bottom: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; 
+        .header-title {
+            margin-top: 0;
+            font-size: 26px;
+            color: #6a5acd;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(106, 90, 205, 0.2);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        /* --- SESSÕES E INPUTS --- */
-        .sessao { 
-            margin-bottom: 20px; padding: 20px; border-radius: 16px; 
-            background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8); transition: 0.3s; 
+        .sessao {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: 0.3s;
         }
-        .sessao:hover { background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .sessao:hover {
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
         label { font-weight: 600; display: block; margin-bottom: 8px; color: var(--text-dark); font-size: 15px; }
-        input[type="file"], input[type="text"] { 
-            width: 100%; padding: 14px 18px; border: 2px solid #e2e8f0; border-radius: 12px; 
-            background: rgba(255,255,255,0.8); font-size: 14px; font-family: 'Poppins', sans-serif; 
-            color: var(--text-dark); transition: 0.3s; outline: none; cursor: pointer;
+        input[type="file"], input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            transition: 0.3s;
+            outline: none;
+            cursor: pointer;
         }
-        input[type="text"]:focus { border-color: #00c9ff; box-shadow: 0 0 0 4px rgba(0, 201, 255, 0.2); background: white;}
-
-        /* --- CAIXA DE STATUS ANIMADA --- */
-        #caixaStatus { 
-            margin-top: 20px; padding: 15px; background: rgba(0, 201, 255, 0.15); 
-            border-radius: 12px; font-size: 16px; color: #005f73; font-weight: 600; 
-            text-align: center; border: 1px solid rgba(0, 201, 255, 0.3); transition: 0.4s;
+        input[type="text"]:focus {
+            border-color: #00c9ff;
+            box-shadow: 0 0 0 4px rgba(0, 201, 255, 0.2);
+            background: white;
+        }
+        #caixaStatus {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 201, 255, 0.15);
+            border-radius: 12px;
+            font-size: 16px;
+            color: #005f73;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid rgba(0, 201, 255, 0.3);
+            transition: 0.4s;
         }
         .piscar { animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.98); } }
-
-        /* --- ABAS MODERNAS (MODULAR) --- */
         .tabs-container { width: 100%; max-width: 900px; margin-bottom: 25px; display: none; }
         .tabs-nav { display: flex; gap: 10px; background: rgba(255,255,255,0.4); padding: 8px; border-radius: 16px; backdrop-filter: blur(10px); }
-        .tab-btn { 
-            flex: 1; padding: 14px; background: transparent; border: none; cursor: pointer; 
-            font-weight: 600; font-size: 15px; color: #636e72; border-radius: 12px; transition: all 0.3s ease; font-family: 'Poppins', sans-serif;
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            color: #636e72;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
         .tab-btn:hover { color: #6a5acd; background: rgba(255,255,255,0.5); }
         .tab-btn.active { background: white; color: #6a5acd; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transform: translateY(-2px); }
-        
         .tab-content { display: none; width: 100%; max-width: 900px; animation: slideUp 0.5s ease-out; }
         .tab-content.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- BOTÕES OUSADOS --- */
-        .btn { 
-            padding: 14px 28px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
-            color: white; font-size: 16px; transition: transform 0.2s ease, box-shadow 0.3s ease; 
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Poppins', sans-serif;
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
         }
         .btn:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .btn:active { transform: scale(0.98); }
-        
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-acao { background: var(--grad-btn); width: 100%; margin-top: 20px; padding: 18px; font-size: 18px; }
         .btn-acao:hover { background: var(--grad-btn-hover); }
         .btn-print { background: linear-gradient(135deg, #11998e, #38ef7d); flex: 1; }
         .btn-reset { background: linear-gradient(135deg, #ff416c, #ff4b2b); flex: 1; }
         .acoes-topo { display: none; gap: 15px; width: 100%; max-width: 900px; margin-bottom: 25px; }
-
-        /* --- ABA 1: LAUDO (MANTIDO SÉRIO PARA IMPRESSÃO) --- */
-        .laudo-folha { 
-            background: white; width: 800px; padding: 50px; margin-bottom: 40px; 
-            border-top: 8px solid #00b894; box-shadow: var(--shadow-float); page-break-after: always; 
-            box-sizing: border-box; margin-left: auto; margin-right: auto; border-radius: 8px; font-family: Arial, sans-serif;
+        .laudo-folha {
+            background: white;
+            width: 800px;
+            padding: 50px;
+            margin-bottom: 40px;
+            border-top: 8px solid #00b894;
+            box-shadow: var(--shadow-float);
+            page-break-after: always;
+            box-sizing: border-box;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
         }
         .topo-laudo { text-align: center; border-bottom: 2px solid #333; margin-bottom: 25px; padding-bottom: 15px; }
         .img-logo { max-height: 80px; margin-bottom: 15px; object-fit: contain; }
         .grid-dados { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         .dado-item { background: #fafafa; padding: 10px; border: 1px solid #eee; border-radius: 6px; }
-        .dado-item strong { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px;}
+        .dado-item strong { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 4px; }
         .dado-item span { font-size: 13px; font-weight: 700; color: #222; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 13px; }
         th { background: #f8f9fa; color: #444; }
         .rodape-discreto { margin-top: 50px; text-align: right; border-top: 1px solid #eee; padding-top: 15px; font-size: 12px; color: #777; }
         .rodape-discreto b { color: #222; font-size: 14px; display: block; margin-top: 4px; }
-
-        /* --- ABA 2: VERIFICAÇÃO NF --- */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full { grid-column: span 2; }
-
-        /* --- ABA 3: E-MAIL --- */
-        .email-box { 
-            background: rgba(255,255,255,0.9); padding: 25px; border: 1px solid #ddd; 
-            border-radius: 16px; white-space: pre-wrap; font-family: 'Courier New', monospace; 
-            font-size: 15px; margin-top: 20px; color: #2d3436; line-height: 1.6; 
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.03); border-left: 5px solid #00c9ff;
+        .email-box {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            margin-top: 20px;
+            color: #2d3436;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.03);
+            border-left: 5px solid #00c9ff;
         }
-
-        /* --- MODO IMPRESSÃO (REMOVE O DESIGN FUTURISTA E DEIXA SÓ O LAUDO BRANCO) --- */
-        @media print { 
+        .app-version {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(45, 52, 54, 0.75);
+            margin-top: 6px;
+            margin-bottom: 12px;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+        @media print {
             body { padding: 0; background: white; align-items: flex-start; }
-            .card-glass, .acoes-topo, .tabs-container { display: none !important; } 
-            .tab-content { display: block !important; animation: none;}
-            .laudo-folha { box-shadow: none; border-top-width: 6px; margin: 0; width: 100%; border-radius: 0; padding: 20px;} 
+            .card-glass, .acoes-topo, .tabs-container { display: none !important; }
+            .tab-content { display: block !important; animation: none; }
+            .laudo-folha { box-shadow: none; border-top-width: 6px; margin: 0; width: 100%; border-radius: 0; padding: 20px; }
             #tabVerificacao, #tabEmail { display: none !important; }
         }
     </style>
 </head>
 <body>
-
     <div class="card-glass" id="painelPrincipal">
         <div class="header-title">
             <span>✨ Quality Dashboard</span>
             <img id="logoPreviewApp" src="https://drive.google.com/uc?id=1lTjM10UgPWuvbFYRGjSy2GP9T4FazkvV" style="height: 45px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
         </div>
-        
         <div class="sessao">
             <label>📑 Selecionar Nota Fiscal (PDF)</label>
             <input type="file" id="fNf" accept="application/pdf">
         </div>
-        
         <div id="caixaStatus">Pronto. Aguardando a magia acontecer... 🚀</div>
     </div>
 
     <div class="acoes-topo" id="areaAcoes">
-        <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir Laudos</button>
+        <button class="btn btn-print" onclick="window.print()" disabled>🖨️ Imprimir Laudos</button>
         <button class="btn btn-reset" onclick="location.reload()">🔄 Analisar Nova NF</button>
     </div>
 
@@ -186,132 +239,203 @@
     <div id="tabVerificacao" class="tab-content">
         <div class="card-glass">
             <h3 style="margin-top: 0; color: #6a5acd; font-size: 22px;">📝 Verificação e Correção (NF)</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 25px;">Os dados abaixo foram pré-preenchidos com base no padrão. O <b>Lote, Fabricação e Validade</b> foram extraídos do PDF. Revise antes de gerar o e-mail!</p>
-            
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 25px;">Os dados abaixo foram pré-preenchidos com base no padrão. O <b>Lote, Fabricação e Validade</b> foram extraídos do PDF. Revise antes de gerar o e-mail.</p>
             <div class="form-grid">
-                <div class="form-group full">
-                    <label>Produto</label>
-                    <input type="text" id="vProduto" value="FERTILIZANTE MINERAL MISTO CYSY+S BIG BAG CARBONATO DE CALCIO E SULFATO DE CALCIO">
-                </div>
-                <div class="form-group">
-                    <label>Registro MAPA</label>
-                    <input type="text" id="vMapa" value="SC-002057">
-                </div>
-                <div class="form-group">
-                    <label>Quantidade</label>
-                    <input type="text" id="vQtd" value="5.000 002">
-                </div>
-                <div class="form-group">
-                    <label>Forma</label>
-                    <input type="text" id="vForma" value="GRANULADO">
-                </div>
-                <div class="form-group">
-                    <label>Composição</label>
-                    <input type="text" id="vComposicao" value="25% CA E 6% S TOTAL">
-                </div>
-                <div class="form-group full">
-                    <label>Uso</label>
-                    <input type="text" id="vUso" value="PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA">
-                </div>
-                <div class="form-group">
-                    <label>Lote Extraído</label>
-                    <input type="text" id="vLote" value="">
-                </div>
-                <div class="form-group">
-                    <label>Fabricação Extraída</label>
-                    <input type="text" id="vFab" value="">
-                </div>
-                <div class="form-group">
-                    <label>Validade Extraída</label>
-                    <input type="text" id="vVal" value="">
-                </div>
+                <div class="form-group full"><label>Produto</label><input type="text" id="vProduto" value="FERTILIZANTE MINERAL MISTO CYSY+S BIG BAG CARBONATO DE CALCIO E SULFATO DE CALCIO"></div>
+                <div class="form-group"><label>Registro MAPA</label><input type="text" id="vMapa" value="SC-002057"></div>
+                <div class="form-group"><label>Quantidade</label><input type="text" id="vQtd" value="5.000 002"></div>
+                <div class="form-group"><label>Forma</label><input type="text" id="vForma" value="GRANULADO"></div>
+                <div class="form-group"><label>Composição</label><input type="text" id="vComposicao" value="25% CA E 6% S TOTAL"></div>
+                <div class="form-group full"><label>Uso</label><input type="text" id="vUso" value="PRODUTO PARA USO EXCLUSIVO NA AGRICULTURA"></div>
+                <div class="form-group"><label>Lote Extraído</label><input type="text" id="vLote" value=""></div>
+                <div class="form-group"><label>Fabricação Extraída</label><input type="text" id="vFab" value=""></div>
+                <div class="form-group"><label>Validade Extraída</label><input type="text" id="vVal" value=""></div>
             </div>
-
             <button class="btn btn-acao" onclick="validarEGerarEmail()">✨ Validar Dados e Gerar E-mail Automático</button>
         </div>
     </div>
-
     <div id="tabEmail" class="tab-content">
         <div class="card-glass">
             <h3 style="margin-top: 0; color: #00c9ff; font-size: 22px;">🚀 E-mail Pronto para Envio</h3>
-            <p style="font-size: 15px; color: var(--text-muted);">Tudo certo! Clique no botão abaixo. O sistema copiará o texto e abrirá o seu Gmail. <strong>Basta colar (Ctrl+V) no corpo da mensagem para manter a sua assinatura de imagem intacta!</strong></p>
-            
+            <p style="font-size: 15px; color: var(--text-muted);">Tudo certo! Clique no botão abaixo. O sistema copiará o texto e abrirá o seu Gmail. <strong>Basta colar (Ctrl+V) no corpo da mensagem para manter a sua assinatura de imagem intacta.</strong></p>
             <button class="btn btn-acao" onclick="abrirGmailComAssinatura()" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);">✉️ Abrir Diretamente no Gmail</button>
-            
             <div class="email-box" id="corpoEmail">O texto do e-mail aparecerá aqui após você clicar em "Validar Dados" na Aba 2.</div>
         </div>
     </div>
+
+    <div class="app-version">V 1.0</div>
 
     <script>
         const API_KEY = "AIzaSyAdzZznAPDRlGLqbT-8AAVSKslZYfr7Jc0";
         const SHEET_ID = "1o0t2cB0CIG2_3d1c4OBjwlE4czu4AdJIKbYQM6WlPcA";
         const LINK_LOGO = "https://raw.githubusercontent.com/Jhonantan-CGS/Atualiza-o-automatica-de-L-udo/main/logo.png.png";
+        const TIMEOUTS_MS = { pdfLoad: 15000, pageRead: 10000, sheetFetch: 8000, totalFlow: 45000 };
+        const loteApiCache = new Map();
+        const flowLogs = [];
+
         let emailAssuntoFinal = "";
         let emailCorpoFinal = "";
         let emailDestinatario = "eng.agronomamatriz@cysy.com.br";
+        let processamentoEmAndamento = false;
+        let execucaoAtivaId = 0;
+
+        const caixaStatus = document.getElementById('caixaStatus');
+        const containerLaudos = document.getElementById('containerLaudos');
+        const areaAcoes = document.getElementById('areaAcoes');
+        const tabsMenu = document.getElementById('tabsMenu');
+        const btnPrint = document.querySelector('.btn-print');
+        const inputArquivo = document.getElementById('fNf');
+
+        if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js";
+        }
+
+        window.addEventListener('error', event => {
+            logFluxo('erro_global', { mensagem: event.message, arquivo: event.filename, linha: event.lineno, coluna: event.colno }, 'error');
+            if (processamentoEmAndamento) {
+                atualizarStatus('❌ O processamento foi interrompido por um erro inesperado.', false, 'error');
+                tabsMenu.style.display = 'none';
+                finalizarExecucao(execucaoAtivaId, { temLaudos: containerLaudos.children.length > 0, mostrarAcoes: true });
+            }
+        });
+
+        window.addEventListener('unhandledrejection', event => {
+            const motivo = event.reason || {};
+            logFluxo('promise_nao_tratada', { mensagem: motivo.message || String(motivo), codigo: motivo.codigo || null }, 'error');
+            if (processamentoEmAndamento) {
+                atualizarStatus('❌ O processamento encontrou uma falha assíncrona inesperada.', false, 'error');
+                tabsMenu.style.display = 'none';
+                finalizarExecucao(execucaoAtivaId, { temLaudos: containerLaudos.children.length > 0, mostrarAcoes: true });
+            }
+        });
 
         function abrirAba(nomeAba, elementoBtn) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(nomeAba).classList.add('active');
-            elementoBtn.classList.add('active');
+            if (elementoBtn) elementoBtn.classList.add('active');
         }
 
-        const caixaStatus = document.getElementById('caixaStatus');
-        async function atualizarStatus(mensagem, animar = true) {
+        function logFluxo(etapa, detalhes = {}, nivel = 'info') {
+            const entrada = { timestamp: new Date().toISOString(), etapa, detalhes };
+            flowLogs.push(entrada);
+            window.__nfFlowLogs = flowLogs;
+            const logger = console[nivel] || console.log;
+            logger(`[NF FLOW] ${etapa}`, detalhes);
+        }
+
+        async function atualizarStatus(mensagem, animar = true, tipo = 'info') {
             caixaStatus.innerHTML = mensagem;
-            if (animar) {
-                caixaStatus.classList.add('piscar');
-                caixaStatus.style.background = "rgba(0, 201, 255, 0.15)";
-                caixaStatus.style.borderColor = "rgba(0, 201, 255, 0.3)";
-                caixaStatus.style.color = "#005f73";
-            } else {
-                caixaStatus.classList.remove('piscar');
-                caixaStatus.style.background = "rgba(16, 185, 129, 0.15)";
-                caixaStatus.style.borderColor = "rgba(16, 185, 129, 0.3)";
-                caixaStatus.style.color = "#065f46";
-            }
-            await new Promise(r => setTimeout(r, 50));
+            caixaStatus.classList.toggle('piscar', animar);
+            const estilos = {
+                info: { background: 'rgba(0, 201, 255, 0.15)', borderColor: 'rgba(0, 201, 255, 0.3)', color: '#005f73' },
+                success: { background: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.3)', color: '#065f46' },
+                error: { background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.3)', color: '#991b1b' },
+                warning: { background: 'rgba(245, 158, 11, 0.15)', borderColor: 'rgba(245, 158, 11, 0.3)', color: '#92400e' }
+            };
+            const estilo = estilos[tipo] || estilos.info;
+            caixaStatus.style.background = estilo.background;
+            caixaStatus.style.borderColor = estilo.borderColor;
+            caixaStatus.style.color = estilo.color;
+            await new Promise(resolve => setTimeout(resolve, 30));
         }
 
-        document.getElementById('fNf').onchange = async e => {
-            const file = e.target.files[0];
-            if (!file) return;
+        function ajustarAcoesTemporarias(temLaudos) {
+            areaAcoes.style.display = 'flex';
+            btnPrint.disabled = !temLaudos;
+        }
 
-            document.getElementById('containerLaudos').innerHTML = "";
-            document.getElementById('areaAcoes').style.display = "none";
-            document.getElementById('tabsMenu').style.display = "none";
+        function prepararNovaExecucao() {
+            containerLaudos.innerHTML = '';
+            areaAcoes.style.display = 'none';
+            tabsMenu.style.display = 'none';
+            btnPrint.disabled = true;
+            emailAssuntoFinal = '';
+            emailCorpoFinal = '';
+            document.getElementById('corpoEmail').innerText = 'O texto do e-mail aparecerá aqui após você clicar em "Validar Dados" na Aba 2.';
+        }
 
-            await atualizarStatus("⏳ Analisando PDF de forma inteligente...");
-            
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            let texto = "";
-            const textosPaginas = [];
-            
-            for(let i=1; i<=pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                const textoPagina = content.items.map(it => it.str).join(' ');
-                textosPaginas.push(textoPagina);
-                texto += ` ${textoPagina}`;
+        function finalizarExecucao(execucaoId, opcoes = {}) {
+            if (execucaoAtivaId !== execucaoId) return;
+            processamentoEmAndamento = false;
+            inputArquivo.disabled = false;
+            inputArquivo.value = '';
+            if (opcoes.temLaudos) {
+                tabsMenu.style.display = 'block';
+                ajustarAcoesTemporarias(true);
+            } else if (opcoes.mostrarAcoes) {
+                ajustarAcoesTemporarias(false);
             }
-            
-            await processarNfPorPagina(texto, textosPaginas);
-        };
+        }
+
+        function criarErroControlado(codigo, mensagemUsuario, detalhes = {}) {
+            const erro = new Error(mensagemUsuario);
+            erro.codigo = codigo;
+            erro.mensagemUsuario = mensagemUsuario;
+            erro.detalhes = detalhes;
+            return erro;
+        }
+
+        async function executarComTimeout(factory, timeoutMs, descricao) {
+            return await new Promise((resolve, reject) => {
+                let finalizado = false;
+                const timeoutId = setTimeout(() => {
+                    if (finalizado) return;
+                    finalizado = true;
+                    logFluxo('timeout', { descricao, timeoutMs }, 'warn');
+                    reject(criarErroControlado('TIMEOUT', `${descricao} excedeu o tempo limite.`, { descricao, timeoutMs }));
+                }, timeoutMs);
+
+                Promise.resolve()
+                    .then(factory)
+                    .then(resultado => {
+                        if (finalizado) return;
+                        finalizado = true;
+                        clearTimeout(timeoutId);
+                        resolve(resultado);
+                    })
+                    .catch(erro => {
+                        if (finalizado) return;
+                        finalizado = true;
+                        clearTimeout(timeoutId);
+                        reject(erro);
+                    });
+            });
+        }
+
+        async function buscarJsonComTimeout(url, timeoutMs, descricao) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                if (!response.ok) {
+                    throw criarErroControlado('API_HTTP', `${descricao} retornou HTTP ${response.status}.`, { url, status: response.status });
+                }
+                return await response.json();
+            } catch (erro) {
+                if (erro.name === 'AbortError') {
+                    throw criarErroControlado('TIMEOUT', `${descricao} excedeu o tempo limite.`, { url, timeoutMs });
+                }
+                throw erro;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        function validarArquivoPdf(file) {
+            if (!file) throw criarErroControlado('ARQUIVO_AUSENTE', 'Nenhum arquivo foi selecionado.');
+            if (!file.name.toLowerCase().endsWith('.pdf')) throw criarErroControlado('TIPO_INVALIDO', 'Selecione um arquivo PDF válido.');
+            logFluxo('arquivo_validado', { nome: file.name, tamanho: file.size });
+        }
 
         function obterSaudacao() {
             const hora = new Date().getHours();
-            if (hora >= 0 && hora < 12) return "Bom dia!";
-            if (hora >= 12 && hora < 18) return "Boa tarde!";
-            return "Boa noite!";
+            if (hora >= 0 && hora < 12) return 'Bom dia!';
+            if (hora >= 12 && hora < 18) return 'Boa tarde!';
+            return 'Boa noite!';
         }
 
-        // --- GERAÇÃO DO EMAIL (A PARTIR DA ABA 2) ---
         function validarEGerarEmail() {
-            const nf = window.numeroNfAtual || "00000";
-            
-            // Pega exatamente o que está preenchido nos inputs da Aba 2
             const produto = document.getElementById('vProduto').value;
             const mapa = document.getElementById('vMapa').value;
             const qtd = document.getElementById('vQtd').value;
@@ -321,54 +445,44 @@
             const lote = document.getElementById('vLote').value;
             const fab = document.getElementById('vFab').value;
             const val = document.getElementById('vVal').value;
-            
-            const saudacao = obterSaudacao();
 
-            // Formatação estrita exigida
-            emailAssuntoFinal = `Emissão de Certificado de Análise - Coopavel`;
-            
-            emailCorpoFinal = `${saudacao}\n\nSegue lote para emissão de certificado de análise, Coopavel.\n\n${produto} - REG. MAPA ${mapa} - ${qtd} - ${forma} - ${comp} - ${uso} - LOTE: ${lote} - FABRICAÇÃO: ${fab} - VALIDADE: ${val}`;
-
+            emailAssuntoFinal = 'Emissão de Certificado de Análise - Coopavel';
+            emailCorpoFinal = `${obterSaudacao()}\n\nSegue lote para emissão de certificado de análise, Coopavel.\n\n${produto} - REG. MAPA ${mapa} - ${qtd} - ${forma} - ${comp} - ${uso} - LOTE: ${lote} - FABRICAÇÃO: ${fab} - VALIDADE: ${val}`;
             document.getElementById('corpoEmail').innerText = `Para: ${emailDestinatario}\nAssunto: ${emailAssuntoFinal}\n\n----------------------------------------------------\n\n${emailCorpoFinal}`;
-            
-            // Pula para a Aba 3
             abrirAba('tabEmail', document.querySelectorAll('.tab-btn')[2]);
         }
 
         function abrirGmailComAssinatura() {
             if (!emailCorpoFinal) {
-                alert("Valide os dados na Aba 2 antes de abrir o Gmail.");
+                alert('Valide os dados na Aba 2 antes de abrir o Gmail.');
                 return;
             }
-
             const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(emailDestinatario)}&su=${encodeURIComponent(emailAssuntoFinal)}&body=${encodeURIComponent(emailCorpoFinal)}`;
             window.open(urlGmail, '_blank');
-
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(emailCorpoFinal).catch(() => {
-                    alert("O Gmail foi aberto com a mensagem preenchida, mas não foi possível copiar o texto automaticamente.");
+                    alert('O Gmail foi aberto com a mensagem preenchida, mas não foi possível copiar o texto automaticamente.');
                 });
             }
         }
-
         function normalizarTextoPdf(texto) {
-            return texto
+            return (texto || '')
                 .replace(/\s+/g, ' ')
                 .toUpperCase()
                 .replace(/CA LCIO/g, 'CALCIO')
                 .replace(/TOT AL/g, 'TOTAL')
-                .replace(/FABR ICACAO/g, 'FABRICACAO');
+                .replace(/FABR ICACAO/g, 'FABRICACAO')
+                .trim();
         }
 
         function extrairOcorrencias(texto, regex) {
             const resultados = [];
+            const regexSeguro = new RegExp(regex.source, regex.flags);
             let match;
-
-            while ((match = regex.exec(texto)) !== null) {
-                const valor = (match[1] || "").trim();
-                if (valor) resultados.push(valor);
+            while ((match = regexSeguro.exec(texto)) !== null) {
+                const valor = match.slice(1).find(Boolean);
+                if (valor) resultados.push(valor.trim());
             }
-
             return resultados;
         }
 
@@ -377,17 +491,9 @@
             return resultados.length > 0 ? resultados[0] : null;
         }
 
-        function extrairNotasFiscais(textoLimpo) {
-            return extrairOcorrencias(textoLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/gi);
-        }
-
-        function extrairDatasEmissao(textoLimpo) {
-            return extrairOcorrencias(textoLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/gi);
-        }
-
-        function extrairLotes(textoLimpo) {
-            return extrairOcorrencias(textoLimpo, /LOTE[\s:]*([A-Z0-9]+)/gi);
-        }
+        function extrairNotasFiscais(textoLimpo) { return extrairOcorrencias(textoLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/gi); }
+        function extrairDatasEmissao(textoLimpo) { return extrairOcorrencias(textoLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/gi); }
+        function extrairLotes(textoLimpo) { return extrairOcorrencias(textoLimpo, /LOTE[\s:]*([A-Z0-9]+)/gi); }
 
         function extrairQuantidades(textoLimpo) {
             const padroes = [
@@ -395,48 +501,36 @@
                 /\b(?:TO|TN|TON|TONELADAS?)\s*(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\b/gi,
                 /\b(\d{1,3}(?:\.\d{3})*(?:,\d{1,4})?)\s*(?:TO|TN|TON|TONELADAS?)\b/gi
             ];
-
             for (const padrao of padroes) {
-                const quantidades = extrairOcorrencias(textoLimpo, padrao);
-                if (quantidades.length > 0) return quantidades;
+                const resultados = extrairOcorrencias(textoLimpo, padrao);
+                if (resultados.length > 0) return resultados;
             }
-
             return [];
         }
 
         function converterQuantidadeParaNumero(valorBruto) {
             if (!valorBruto) return null;
-
-            const numero = parseFloat(valorBruto.replace(/\./g, '').replace(',', '.'));
+            const numero = parseFloat(String(valorBruto).replace(/\./g, '').replace(',', '.'));
             return Number.isFinite(numero) ? numero : null;
         }
 
         function formatarQuantidadeToneladas(valorBruto) {
             const numero = converterQuantidadeParaNumero(valorBruto);
-            if (numero === null) return "---";
-
-            return numero.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            if (numero === null) return '---';
+            return numero.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        function extrairFabricacao(textoLimpo) {
-            return extrairPrimeiraOcorrencia(textoLimpo, /FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i);
-        }
-
-        function extrairValidade(textoLimpo) {
-            return extrairPrimeiraOcorrencia(textoLimpo, /VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i);
-        }
+        function extrairFabricacao(textoLimpo) { return extrairPrimeiraOcorrencia(textoLimpo, /FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i); }
+        function extrairValidade(textoLimpo) { return extrairPrimeiraOcorrencia(textoLimpo, /VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i); }
 
         function extrairCliente(textoOriginal) {
-            const clienteRaw = textoOriginal.match(/NOME\/RAZ\S*\s+SOCIAL\s+(.*?)(?:\s+ENDERE\S*O|\s+CNPJ)/i);
-            return clienteRaw ? clienteRaw[1].trim() : "---";
+            const clienteRaw = (textoOriginal || '').match(/NOME\/RAZ\S*\s+SOCIAL\s+(.*?)(?:\s+ENDERE\S*O|\s+CNPJ)/i);
+            return clienteRaw ? clienteRaw[1].trim() : '---';
         }
 
         function extrairDescricaoProduto(textoLimpo) {
             const descMatch = textoLimpo.match(/\d{5}\s+(FERTILIZANTE.*?AGRICULTURA)/i);
-            return descMatch ? descMatch[1] : "FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS";
+            return descMatch ? descMatch[1] : 'FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS';
         }
 
         function montarContextoGlobal(textoOriginal, textoLimpo) {
@@ -454,235 +548,117 @@
 
         function montarRegistroPagina(textoPagina, indicePagina, contextoGlobal) {
             const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
-            const quantidadeBruta = (extrairQuantidades(textoPaginaLimpo)[0])
-                || contextoGlobal.quantidades[indicePagina]
-                || contextoGlobal.quantidades[0]
-                || null;
-
+            const quantidadeBruta = extrairQuantidades(textoPaginaLimpo)[0] || contextoGlobal.quantidades[indicePagina] || contextoGlobal.quantidades[0] || null;
             const registro = {
-                nf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/i) || contextoGlobal.nfs[indicePagina] || contextoGlobal.nfs[0] || "---",
-                dataNf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/i) || contextoGlobal.datasNf[indicePagina] || contextoGlobal.datasNf[0] || "---",
-                lote: extrairPrimeiraOcorrencia(textoPaginaLimpo, /LOTE[\s:]*([A-Z0-9]+)/i) || contextoGlobal.lotes[indicePagina] || contextoGlobal.lotes[0] || "---",
+                nf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /NF-?E[^0-9]{0,20}N[.\sº]*0*(\d{4,9})/i) || contextoGlobal.nfs[indicePagina] || contextoGlobal.nfs[0] || '---',
+                dataNf: extrairPrimeiraOcorrencia(textoPaginaLimpo, /DATA DE EMISS\S*[\s:\-]*(\d{2}\/\d{2}\/\d{4})/i) || contextoGlobal.datasNf[indicePagina] || contextoGlobal.datasNf[0] || '---',
+                lote: extrairPrimeiraOcorrencia(textoPaginaLimpo, /LOTE[\s:]*([A-Z0-9]+)/i) || contextoGlobal.lotes[indicePagina] || contextoGlobal.lotes[0] || '---',
                 quantidadeBruta,
                 quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
-                fab: extrairFabricacao(textoPaginaLimpo) || contextoGlobal.fab || "---",
-                val: extrairValidade(textoPaginaLimpo) || contextoGlobal.val || "---"
+                fab: extrairFabricacao(textoPaginaLimpo) || contextoGlobal.fab || '---',
+                val: extrairValidade(textoPaginaLimpo) || contextoGlobal.val || '---'
             };
-
-            const temDadosPagina = [registro.nf, registro.lote, registro.quantidadeBruta].some((valor) => valor && valor !== "---");
-            return temDadosPagina ? registro : null;
-        }
-
-        function montarRegistrosLaudo(textosPaginas, textoCompletoLimpo) {
-            const registros = [];
-            const qtdsGlobais = extrairQuantidades(textoCompletoLimpo);
-            let indiceQtdGlobal = 0;
-
-            // Cada página mantém seu próprio contexto para evitar desencontro entre lote e quantidade.
-            textosPaginas.forEach((textoPagina) => {
-                const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
-                const lotesPagina = extrairLotes(textoPaginaLimpo);
-                const qtdsPagina = extrairQuantidades(textoPaginaLimpo);
-                const qtdUnicaPagina = qtdsPagina.length === 1 ? qtdsPagina[0] : null;
-
-                lotesPagina.forEach((lote, indiceLote) => {
-                    const quantidade = qtdsPagina[indiceLote] || qtdUnicaPagina || qtdsGlobais[indiceQtdGlobal] || null;
-                    registros.push({ lote, quantidade });
-                    indiceQtdGlobal += 1;
-                });
-            });
-
-            if (registros.length > 0) return registros;
-
-            const lotesGlobais = extrairLotes(textoCompletoLimpo);
-            const qtdUnicaGlobal = qtdsGlobais.length === 1 ? qtdsGlobais[0] : null;
-
-            return lotesGlobais.map((lote, indice) => ({
-                lote,
-                quantidade: qtdsGlobais[indice] || qtdUnicaGlobal || null
-            }));
+            const temDadosMinimos = [registro.nf, registro.lote, registro.quantidadeBruta].some(valor => valor && valor !== '---');
+            return temDadosMinimos ? registro : null;
         }
 
         function montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal) {
-            const registros = textosPaginas
-                .map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal))
-                .filter(Boolean);
-
+            const registros = textosPaginas.map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal)).filter(Boolean);
             if (registros.length > 0) return registros;
 
-            const totalRegistros = Math.max(
-                contextoGlobal.nfs.length,
-                contextoGlobal.datasNf.length,
-                contextoGlobal.lotes.length,
-                contextoGlobal.quantidades.length,
-                1
-            );
-
+            const totalRegistros = Math.max(contextoGlobal.nfs.length, contextoGlobal.datasNf.length, contextoGlobal.lotes.length, contextoGlobal.quantidades.length, 1);
             return Array.from({ length: totalRegistros }, (_, indice) => {
                 const quantidadeBruta = contextoGlobal.quantidades[indice] || contextoGlobal.quantidades[0] || null;
-
                 return {
-                    nf: contextoGlobal.nfs[indice] || contextoGlobal.nfs[0] || "---",
-                    dataNf: contextoGlobal.datasNf[indice] || contextoGlobal.datasNf[0] || "---",
-                    lote: contextoGlobal.lotes[indice] || contextoGlobal.lotes[0] || "---",
+                    nf: contextoGlobal.nfs[indice] || contextoGlobal.nfs[0] || '---',
+                    dataNf: contextoGlobal.datasNf[indice] || contextoGlobal.datasNf[0] || '---',
+                    lote: contextoGlobal.lotes[indice] || contextoGlobal.lotes[0] || '---',
                     quantidadeBruta,
                     quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
-                    fab: contextoGlobal.fab || "---",
-                    val: contextoGlobal.val || "---"
+                    fab: contextoGlobal.fab || '---',
+                    val: contextoGlobal.val || '---'
                 };
-            }).filter((registro) => registro.lote !== "---" || registro.nf !== "---");
+            }).filter(registro => registro.lote !== '---' || registro.nf !== '---');
         }
 
-        async function processarNf(texto, textosPaginas = [texto]) {
-            await atualizarStatus("🔍 Buscando Lotes e cruzando dados...");
-            
-            const textoLimpo = normalizarTextoPdf(texto);
+        async function extrairPaginasDoPdf(file) {
+            if (!window.pdfjsLib || typeof pdfjsLib.getDocument !== 'function') {
+                throw criarErroControlado('PDFJS_INDISPONIVEL', 'A biblioteca de leitura de PDF não foi carregada corretamente.');
+            }
+            logFluxo('arquivo_recebido', { nome: file.name, tamanho: file.size, tipo: file.type });
+            await atualizarStatus('⏳ Lendo arquivo PDF...', true, 'info');
+            const arrayBuffer = await executarComTimeout(() => file.arrayBuffer(), TIMEOUTS_MS.pdfLoad, 'Leitura do arquivo PDF');
+            logFluxo('leitura_arquivo_concluida', { bytes: arrayBuffer.byteLength });
 
-            const nf = (textoLimpo.match(/N[.\sº]*0*(\d{4,9})/i) || ["","---"])[1];
-            window.numeroNfAtual = nf; 
-            
-            const dataNf = (textoLimpo.match(/(\d{2}\/\d{2}\/\d{4})/) || ["","---"])[1];
-            
-            let clienteRaw = texto.match(/NOME\/RAZ[ÃA]O SOCIAL\s+(.*?)(?:\s+ENDERE[ÇC]O|\s+CNPJ)/i);
-            const cliente = clienteRaw ? clienteRaw[1].trim() : "---";
-            
-            // Tenta pegar a descrição do PDF apenas para o Laudo
-            const descMatch = textoLimpo.match(/\d{5}\s+(FERTILIZANTE.*?AGRICULTURA)/i);
-            const descCompletaPdf = descMatch ? descMatch[1] : "FERTILIZANTE MINERAL SIMPL CONCHAS MARINHAS MOÍDAS";
-            
-            const registrosLaudo = montarRegistrosLaudo(textosPaginas, textoLimpo);
+            await atualizarStatus('📄 Abrindo PDF...', true, 'info');
+            const pdf = await executarComTimeout(() => pdfjsLib.getDocument({ data: arrayBuffer }).promise, TIMEOUTS_MS.pdfLoad, 'Abertura do PDF');
+            logFluxo('pdf_aberto', { paginas: pdf.numPages });
 
-            const fabMatch = textoLimpo.match(/FABRICACAO[\s:\-]*(\d{2}\/\d{2,4})/i);
-            const valMatch = textoLimpo.match(/VALIDADE[\s:\-]*(\d{2}\/\d{2,4})/i);
-            
-            // PREENCHE A ABA 2 (Verificação) COM O QUE ENCONTROU NO PDF
-            if(registrosLaudo.length > 0) document.getElementById('vLote').value = registrosLaudo[0].lote;
-            if(fabMatch) document.getElementById('vFab').value = fabMatch[1];
-            if(valMatch) document.getElementById('vVal').value = valMatch[1];
-
-            const area = document.getElementById('containerLaudos');
-            area.innerHTML = "";
-
-            if(registrosLaudo.length === 0) {
-                await atualizarStatus("⚠️ Nenhum lote encontrado. Verifique o PDF.", false);
-                return;
+            const textosPaginas = [];
+            for (let paginaIndex = 1; paginaIndex <= pdf.numPages; paginaIndex++) {
+                await atualizarStatus(`📄 Extraindo texto da página ${paginaIndex}/${pdf.numPages}...`, true, 'info');
+                logFluxo('leitura_pagina_iniciada', { pagina: paginaIndex });
+                const page = await executarComTimeout(() => pdf.getPage(paginaIndex), TIMEOUTS_MS.pageRead, `Abertura da página ${paginaIndex}`);
+                const content = await executarComTimeout(() => page.getTextContent(), TIMEOUTS_MS.pageRead, `Leitura da página ${paginaIndex}`);
+                const textoPagina = content.items.map(item => item.str).join(' ').trim();
+                textosPaginas.push(textoPagina);
+                logFluxo('leitura_pagina_concluida', { pagina: paginaIndex, itensTexto: content.items.length, caracteres: textoPagina.length });
             }
 
-            for(let i=0; i<registrosLaudo.length; i++) {
-                const registroAtual = registrosLaudo[i];
-                const final = registroAtual.lote.slice(-4);
-                let dados = { dureza: "3,30", m4: 0, m10: 98.33, m18: 1.19, prato: 0.48 };
-
-                const tonExibicao = formatarQuantidadeToneladas(registroAtual.quantidade);
-
-                await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${registroAtual.lote}...`);
-
-                try {
-                    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${final}'!A1:G20?key=${API_KEY}`);
-                    const json = await res.json();
-                    if(json.values) {
-                        const r = json.values.find(line => line[1] === "MÉDIA");
-                        if(r) {
-                            dados.dureza = r[2] || "3,30";
-                            dados.m4 = parseFloat((r[3]||"0").replace(',','.'));
-                            dados.m10 = parseFloat((r[4]||"0").replace(',','.'));
-                            dados.m18 = parseFloat((r[5]||"0").replace(',','.'));
-                            dados.prato = (100 - (dados.m4 + dados.m10 + dados.m18)).toFixed(2);
-                        }
-                    }
-                } catch(e) { }
-
-                area.innerHTML += `
-                    <div class="laudo-folha">
-                        <div class="topo-laudo">
-                            <img src="${LINK_LOGO}" class="img-logo">
-                            <h2 style="margin:0; font-size: 18px; text-transform:uppercase; font-family: Arial, sans-serif;">Boletim de Análise de Qualidade</h2>
-                        </div>
-                        <div class="grid-dados" style="font-family: Arial, sans-serif;">
-                            <div class="dado-item" style="grid-column: span 2;"><strong>Cliente / Destinatário</strong><span>${cliente}</span></div>
-                            <div class="dado-item" style="grid-column: span 2;"><strong>Descrição do Produto</strong><span>${descCompletaPdf}</span></div>
-                            <div class="dado-item"><strong>Nota Fiscal</strong><span>${nf}</span></div>
-                            <div class="dado-item"><strong>Data de Emissão</strong><span>${dataNf}</span></div>
-                            <div class="dado-item"><strong>Número do Lote</strong><span>${registroAtual.lote}</span></div>
-                            <div class="dado-item"><strong>Quantidade (TN)</strong><span>${tonExibicao} Toneladas</span></div>
-                        </div>
-                        <table style="font-family: Arial, sans-serif;">
-                            <thead><tr><th>MALHA</th><th>ESPECIFICAÇÃO</th><th>RESULTADO</th></tr></thead>
-                            <tbody>
-                                <tr><td>MALHA 4</td><td>Máx 5%</td><td>${dados.m4.toFixed(2)}%</td></tr>
-                                <tr><td>MALHA 10</td><td>90 a 100%</td><td>${dados.m10.toFixed(2)}%</td></tr>
-                                <tr><td>MALHA 18</td><td>Máx 10%</td><td>${dados.m18.toFixed(2)}%</td></tr>
-                                <tr><td>PRATO</td><td>Máx 5%</td><td>${dados.prato}%</td></tr>
-                            </tbody>
-                        </table>
-                        <div style="font-size: 13px; font-family: Arial, sans-serif;"><strong>RESULTADO DURÔMETRO:</strong> ${dados.dureza}</div>
-                        <div class="rodape-discreto" style="font-family: Arial, sans-serif;">
-                            Responsável Técnico / Qualidade
-                            <b>Jhonantan Cardoso Gonçalves</b>
-                        </div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('areaAcoes').style.display = "flex";
-            document.getElementById('tabsMenu').style.display = "block";
-            await atualizarStatus("✨ Sucesso! Acesse as abas para Gerar o E-mail ou Imprimir.", false);
-            
-            abrirAba('tabVerificacao', document.querySelectorAll('.tab-btn')[1]);
+            const textoCompleto = textosPaginas.join(' ').trim();
+            if (!textoCompleto) throw criarErroControlado('PDF_SEM_TEXTO', 'Não foi possível extrair texto útil do PDF selecionado.');
+            return { textoCompleto, textosPaginas };
         }
-        async function processarNfPorPagina(texto, textosPaginas = [texto]) {
-            await atualizarStatus("🔍 Buscando Lotes e cruzando dados...");
-
-            const textoLimpo = normalizarTextoPdf(texto);
-            const contextoGlobal = montarContextoGlobal(texto, textoLimpo);
-            const registrosLaudo = montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal);
-            const primeiroRegistro = registrosLaudo[0] || null;
-
-            window.numeroNfAtual = primeiroRegistro ? primeiroRegistro.nf : (contextoGlobal.nfs[0] || "---");
-
-            if (primeiroRegistro && primeiroRegistro.lote && primeiroRegistro.lote !== "---") {
-                document.getElementById('vLote').value = primeiroRegistro.lote;
-            }
-            if (primeiroRegistro && primeiroRegistro.fab && primeiroRegistro.fab !== "---") {
-                document.getElementById('vFab').value = primeiroRegistro.fab;
-            }
-            if (primeiroRegistro && primeiroRegistro.val && primeiroRegistro.val !== "---") {
-                document.getElementById('vVal').value = primeiroRegistro.val;
+        async function consultarDadosLote(lote) {
+            if (!lote || lote === '---') {
+                logFluxo('consulta_lote_sem_lote', { lote }, 'warn');
+                return { dureza: '3,30', m4: 0, m10: 98.33, m18: 1.19, prato: '0.48' };
             }
 
-            const area = document.getElementById('containerLaudos');
-            area.innerHTML = "";
-
-            if (registrosLaudo.length === 0) {
-                await atualizarStatus("⚠️ Nenhum lote encontrado. Verifique o PDF.", false);
-                return;
+            const chave = lote.slice(-4);
+            if (loteApiCache.has(chave)) {
+                logFluxo('cache_lote_hit', { lote, chave });
+                return loteApiCache.get(chave);
             }
 
-            for (let i = 0; i < registrosLaudo.length; i++) {
-                const registroAtual = registrosLaudo[i];
-                const loteParaConsulta = registroAtual.lote && registroAtual.lote !== "---" ? registroAtual.lote.slice(-4) : "";
-                let dados = { dureza: "3,30", m4: 0, m10: 98.33, m18: 1.19, prato: 0.48 };
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${chave}'!A1:G20?key=${API_KEY}`;
+            logFluxo('consulta_lote_iniciada', { lote, chave });
+            try {
+                const json = await buscarJsonComTimeout(url, TIMEOUTS_MS.sheetFetch, `Consulta do lote ${lote}`);
+                const linhas = Array.isArray(json.values) ? json.values : [];
+                const media = linhas.find(line => Array.isArray(line) && line[1] === 'MÉDIA');
+                const dados = media ? {
+                    dureza: media[2] || '3,30',
+                    m4: parseFloat((media[3] || '0').replace(',', '.')) || 0,
+                    m10: parseFloat((media[4] || '0').replace(',', '.')) || 0,
+                    m18: parseFloat((media[5] || '0').replace(',', '.')) || 0
+                } : {
+                    dureza: '3,30',
+                    m4: 0,
+                    m10: 98.33,
+                    m18: 1.19
+                };
+                dados.prato = (100 - (dados.m4 + dados.m10 + dados.m18)).toFixed(2);
+                loteApiCache.set(chave, dados);
+                logFluxo('consulta_lote_concluida', { lote, encontrouMedia: Boolean(media), linhas: linhas.length });
+                return dados;
+            } catch (erro) {
+                logFluxo('consulta_lote_falhou', { lote, codigo: erro.codigo || 'ERRO', mensagem: erro.message }, 'warn');
+                return { dureza: '3,30', m4: 0, m10: 98.33, m18: 1.19, prato: '0.48' };
+            }
+        }
 
-                if (loteParaConsulta) {
-                    await atualizarStatus(`☁️ Conectando à API do Google para o Lote ${registroAtual.lote}...`);
+        function preencherAbaVerificacao(registro) {
+            if (!registro) return;
+            if (registro.lote && registro.lote !== '---') document.getElementById('vLote').value = registro.lote;
+            if (registro.fab && registro.fab !== '---') document.getElementById('vFab').value = registro.fab;
+            if (registro.val && registro.val !== '---') document.getElementById('vVal').value = registro.val;
+        }
 
-                    try {
-                        const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'LOTE ${loteParaConsulta}'!A1:G20?key=${API_KEY}`);
-                        const json = await res.json();
-                        if (json.values) {
-                            const r = json.values.find(line => line[1] === "MÉDIA");
-                            if (r) {
-                                dados.dureza = r[2] || "3,30";
-                                dados.m4 = parseFloat((r[3] || "0").replace(',', '.'));
-                                dados.m10 = parseFloat((r[4] || "0").replace(',', '.'));
-                                dados.m18 = parseFloat((r[5] || "0").replace(',', '.'));
-                                dados.prato = (100 - (dados.m4 + dados.m10 + dados.m18)).toFixed(2);
-                            }
-                        }
-                    } catch (e) { }
-                }
-
-                area.innerHTML += `
+        function renderizarLaudos(registrosLaudo, contextoGlobal, resultadosLotes) {
+            containerLaudos.innerHTML = registrosLaudo.map((registroAtual, indice) => {
+                const dados = resultadosLotes[indice];
+                return `
                     <div class="laudo-folha">
                         <div class="topo-laudo">
                             <img src="${LINK_LOGO}" class="img-logo">
@@ -712,14 +688,80 @@
                         </div>
                     </div>
                 `;
+            }).join('');
+        }
+
+        async function executarFluxoPrincipal(file, execucaoId) {
+            logFluxo('fluxo_iniciado', { execucaoId });
+            await atualizarStatus('⏳ Iniciando processamento do PDF...', true, 'info');
+            const { textoCompleto, textosPaginas } = await extrairPaginasDoPdf(file);
+            const textoLimpo = normalizarTextoPdf(textoCompleto);
+            const contextoGlobal = montarContextoGlobal(textoCompleto, textoLimpo);
+            logFluxo('dados_extraidos', { nfs: contextoGlobal.nfs, lotes: contextoGlobal.lotes, quantidades: contextoGlobal.quantidades });
+
+            await atualizarStatus('🔎 Buscando Lotes e cruzando dados...', true, 'info');
+            const registrosLaudo = montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal);
+            logFluxo('cruzamento_concluido', { registros: registrosLaudo });
+
+            if (!Array.isArray(registrosLaudo) || registrosLaudo.length === 0) {
+                throw criarErroControlado('LOTE_NAO_ENCONTRADO', 'Nenhum lote compatível foi localizado neste PDF.');
             }
 
-            document.getElementById('areaAcoes').style.display = "flex";
-            document.getElementById('tabsMenu').style.display = "block";
-            await atualizarStatus("✨ Sucesso! Acesse as abas para Gerar o E-mail ou Imprimir.", false);
+            preencherAbaVerificacao(registrosLaudo[0]);
+            window.numeroNfAtual = registrosLaudo[0].nf || '---';
 
+            const resultadosLotes = [];
+            for (let i = 0; i < registrosLaudo.length; i++) {
+                const registroAtual = registrosLaudo[i];
+                await atualizarStatus(`☁️ Consultando resultados do lote ${registroAtual.lote} (${i + 1}/${registrosLaudo.length})...`, true, 'info');
+                resultadosLotes.push(await consultarDadosLote(registroAtual.lote));
+            }
+
+            await atualizarStatus('🧾 Renderizando laudos...', true, 'info');
+            renderizarLaudos(registrosLaudo, contextoGlobal, resultadosLotes);
+            logFluxo('renderizacao_concluida', { quantidadeLaudos: registrosLaudo.length });
+
+            tabsMenu.style.display = 'block';
+            ajustarAcoesTemporarias(true);
+            await atualizarStatus('✅ Sucesso! Acesse as abas para gerar o e-mail ou imprimir.', false, 'success');
             abrirAba('tabVerificacao', document.querySelectorAll('.tab-btn')[1]);
         }
+
+        function tratarErroDeFluxo(erro, execucaoId) {
+            const mensagem = erro.mensagemUsuario || erro.message || 'Ocorreu um erro inesperado durante o processamento.';
+            logFluxo('erro_capturado', { execucaoId, codigo: erro.codigo || 'ERRO_DESCONHECIDO', mensagem, detalhes: erro.detalhes || null }, 'error');
+            atualizarStatus(`❌ ${mensagem}`, false, 'error');
+            tabsMenu.style.display = 'none';
+            ajustarAcoesTemporarias(false);
+        }
+
+        async function iniciarProcessamentoArquivo(file) {
+            if (processamentoEmAndamento) {
+                logFluxo('execucao_duplicada_bloqueada', { nomeArquivo: file ? file.name : null }, 'warn');
+                await atualizarStatus('⏳ Já existe um processamento em andamento. Aguarde a conclusão.', false, 'warning');
+                return;
+            }
+
+            const execucaoId = ++execucaoAtivaId;
+            processamentoEmAndamento = true;
+            inputArquivo.disabled = true;
+            prepararNovaExecucao();
+
+            try {
+                validarArquivoPdf(file);
+                await executarComTimeout(() => executarFluxoPrincipal(file, execucaoId), TIMEOUTS_MS.totalFlow, 'Processamento completo da nota fiscal');
+            } catch (erro) {
+                tratarErroDeFluxo(erro, execucaoId);
+            } finally {
+                finalizarExecucao(execucaoId, { temLaudos: containerLaudos.children.length > 0, mostrarAcoes: true });
+                logFluxo('loading_finalizado', { execucaoId, temLaudos: containerLaudos.children.length > 0 });
+            }
+        }
+
+        document.getElementById('fNf').onchange = async event => {
+            const file = event.target.files[0];
+            await iniciarProcessamentoArquivo(file);
+        };
     </script>
 </body>
 </html>
