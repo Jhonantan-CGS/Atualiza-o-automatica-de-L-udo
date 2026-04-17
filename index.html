@@ -263,7 +263,7 @@
         </div>
     </div>
 
-    <div class="app-version">V 1.1</div>
+    <div class="app-version">V 1.2</div>
 
     <script>
         const API_KEY = "AIzaSyAdzZznAPDRlGLqbT-8AAVSKslZYfr7Jc0";
@@ -496,6 +496,15 @@
             return Math.floor(numero);
         }
 
+        function obterTamanhoSeguroColecao(valor, contexto) {
+            const tamanho = normalizarContagem(valor && typeof valor.length === 'number' ? valor.length : 0, 0);
+            if (tamanho > 100) {
+                logFluxo('colecao_tamanho_invalido', { contexto, tamanho }, 'warn');
+                throw criarErroControlado('COLECAO_INVALIDA', `Foi detectada uma contagem inválida em ${contexto}.`, { contexto, tamanho });
+            }
+            return tamanho;
+        }
+
         function extrairPrimeiraOcorrencia(texto, regex) {
             const resultados = extrairOcorrencias(texto, regex);
             return resultados.length > 0 ? resultados[0] : null;
@@ -556,7 +565,7 @@
             };
         }
 
-        function montarRegistroPagina(textoPagina, indicePagina, contextoGlobal) {
+        function montarRegistroPagina_legado(textoPagina, indicePagina, contextoGlobal) {
             const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
             const quantidadeBruta = extrairQuantidades(textoPaginaLimpo)[0] || contextoGlobal.quantidades[indicePagina] || contextoGlobal.quantidades[0] || null;
             const registro = {
@@ -572,7 +581,7 @@
             return temDadosMinimos ? registro : null;
         }
 
-        function montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal) {
+        function montarRegistrosLaudoPorPagina_legado(textosPaginas, contextoGlobal) {
             const paginas = garantirArray(textosPaginas);
             const registros = paginas.map((textoPagina, indicePagina) => montarRegistroPagina(textoPagina, indicePagina, contextoGlobal)).filter(Boolean);
             if (registros.length > 0) return registros;
@@ -599,6 +608,99 @@
             }).filter(registro => registro.lote !== '---' || registro.nf !== '---');
         }
 
+        function coletarMetadadosPagina(textoPagina, indicePagina) {
+            const textoPaginaLimpo = normalizarTextoPdf(textoPagina);
+            const metadados = {
+                indicePagina,
+                textoPaginaLimpo,
+                nfs: garantirArray(extrairNotasFiscais(textoPaginaLimpo)),
+                datasNf: garantirArray(extrairDatasEmissao(textoPaginaLimpo)),
+                lotes: garantirArray(extrairLotes(textoPaginaLimpo)),
+                quantidades: garantirArray(extrairQuantidades(textoPaginaLimpo)),
+                fab: extrairFabricacao(textoPaginaLimpo),
+                val: extrairValidade(textoPaginaLimpo)
+            };
+            logFluxo('pagina_analisada', {
+                pagina: indicePagina + 1,
+                caracteres: textoPaginaLimpo.length,
+                nfs: metadados.nfs.length,
+                datas: metadados.datasNf.length,
+                lotes: metadados.lotes.length,
+                quantidades: metadados.quantidades.length,
+                primeiraNf: metadados.nfs[0] || null,
+                primeiroLote: metadados.lotes[0] || null,
+                primeiraQuantidade: metadados.quantidades[0] || null
+            });
+            return metadados;
+        }
+
+        function montarRegistroPagina(textoPagina, indicePagina, contextoGlobal) {
+            const metadadosPagina = coletarMetadadosPagina(textoPagina, indicePagina);
+            const quantidadeBruta = metadadosPagina.quantidades[0] || contextoGlobal.quantidades[indicePagina] || contextoGlobal.quantidades[0] || null;
+            const registro = {
+                nf: metadadosPagina.nfs[0] || contextoGlobal.nfs[indicePagina] || contextoGlobal.nfs[0] || '---',
+                dataNf: metadadosPagina.datasNf[0] || contextoGlobal.datasNf[indicePagina] || contextoGlobal.datasNf[0] || '---',
+                lote: metadadosPagina.lotes[0] || contextoGlobal.lotes[indicePagina] || contextoGlobal.lotes[0] || '---',
+                quantidadeBruta,
+                quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
+                fab: metadadosPagina.fab || contextoGlobal.fab || '---',
+                val: metadadosPagina.val || contextoGlobal.val || '---'
+            };
+            const temDadosMinimos = [registro.nf, registro.lote, registro.quantidadeBruta].some(valor => valor && valor !== '---');
+            logFluxo('registro_pagina_montado', {
+                pagina: indicePagina + 1,
+                nf: registro.nf,
+                lote: registro.lote,
+                quantidadeBruta: registro.quantidadeBruta,
+                quantidadeFormatada: registro.quantidadeFormatada,
+                temDadosMinimos
+            });
+            return temDadosMinimos ? registro : null;
+        }
+
+        function montarRegistrosFallback(contextoGlobal) {
+            const totalRegistros = Math.max(
+                obterTamanhoSeguroColecao(contextoGlobal.nfs, 'nfs globais'),
+                obterTamanhoSeguroColecao(contextoGlobal.datasNf, 'datas globais'),
+                obterTamanhoSeguroColecao(contextoGlobal.lotes, 'lotes globais'),
+                obterTamanhoSeguroColecao(contextoGlobal.quantidades, 'quantidades globais'),
+                1
+            );
+            const registros = [];
+            logFluxo('fallback_global_iniciado', { totalRegistros });
+            for (let indice = 0; indice < totalRegistros; indice++) {
+                const quantidadeBruta = contextoGlobal.quantidades[indice] || contextoGlobal.quantidades[0] || null;
+                const registro = {
+                    nf: contextoGlobal.nfs[indice] || contextoGlobal.nfs[0] || '---',
+                    dataNf: contextoGlobal.datasNf[indice] || contextoGlobal.datasNf[0] || '---',
+                    lote: contextoGlobal.lotes[indice] || contextoGlobal.lotes[0] || '---',
+                    quantidadeBruta,
+                    quantidadeFormatada: formatarQuantidadeToneladas(quantidadeBruta),
+                    fab: contextoGlobal.fab || '---',
+                    val: contextoGlobal.val || '---'
+                };
+                if (registro.lote !== '---' || registro.nf !== '---') registros.push(registro);
+            }
+            logFluxo('fallback_global_concluido', { totalRegistros, registrosValidos: registros.length });
+            return registros;
+        }
+
+        function montarRegistrosLaudoPorPagina(textosPaginas, contextoGlobal) {
+            const paginas = garantirArray(textosPaginas);
+            const totalPaginas = obterTamanhoSeguroColecao(paginas, 'paginas extraidas');
+            const registros = [];
+            for (let indicePagina = 0; indicePagina < totalPaginas; indicePagina++) {
+                const registro = montarRegistroPagina(paginas[indicePagina], indicePagina, contextoGlobal);
+                if (registro) registros.push(registro);
+            }
+            if (registros.length > 0) {
+                logFluxo('registros_por_pagina_concluidos', { totalPaginas, registrosValidos: registros.length });
+                return registros;
+            }
+            logFluxo('registros_por_pagina_vazios', { totalPaginas }, 'warn');
+            return montarRegistrosFallback(contextoGlobal);
+        }
+
         async function extrairPaginasDoPdf(file) {
             if (!window.pdfjsLib || typeof pdfjsLib.getDocument !== 'function') {
                 throw criarErroControlado('PDFJS_INDISPONIVEL', 'A biblioteca de leitura de PDF não foi carregada corretamente.');
@@ -609,7 +711,7 @@
             logFluxo('leitura_arquivo_concluida', { bytes: arrayBuffer.byteLength });
 
             await atualizarStatus('📄 Abrindo PDF...', true, 'info');
-            const pdf = await executarComTimeout(() => pdfjsLib.getDocument({ data: arrayBuffer }).promise, TIMEOUTS_MS.pdfLoad, 'Abertura do PDF');
+            const pdf = await executarComTimeout(() => pdfjsLib.getDocument(arrayBuffer).promise, TIMEOUTS_MS.pdfLoad, 'Abertura do PDF');
             const totalPaginas = normalizarContagem(pdf.numPages);
             if (!totalPaginas) {
                 throw criarErroControlado('PDF_SEM_PAGINAS', 'O PDF não possui páginas válidas para leitura.');
@@ -625,7 +727,12 @@
                 const itens = garantirArray(content && content.items);
                 const textoPagina = itens.map(item => item.str).join(' ').trim();
                 textosPaginas.push(textoPagina);
-                logFluxo('leitura_pagina_concluida', { pagina: paginaIndex, itensTexto: itens.length, caracteres: textoPagina.length });
+                logFluxo('leitura_pagina_concluida', {
+                    pagina: paginaIndex,
+                    itensTexto: itens.length,
+                    caracteres: textoPagina.length,
+                    amostraTexto: textoPagina.slice(0, 180)
+                });
             }
 
             const textoCompleto = textosPaginas.join(' ').trim();
